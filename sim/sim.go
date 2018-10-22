@@ -23,6 +23,10 @@ func (self *Frame) Height() int {
 	return len(self.halite[0])
 }
 
+func (self *Frame) Players() int {
+	return len(self.budgets)
+}
+
 func (self *Frame) Copy() *Frame {
 
 	new_frame := new(Frame)

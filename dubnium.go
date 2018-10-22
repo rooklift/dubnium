@@ -110,6 +110,11 @@ func main() {
 
 	players := len(botlist)
 
+	if initial_frame != nil && initial_frame.Players() != players {
+		fmt.Printf("Wrong number of bots (%d) given for this replay (need %d)\n", players, initial_frame.Players())
+		return
+	}
+
 	if players < 1 || players > 4 {
 		fmt.Printf("Bad number of players: %d\n", players)
 		return
