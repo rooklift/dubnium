@@ -316,6 +316,9 @@ func parse_args() (int, int, int64, []string) {
 
 	rand.Seed(seed)		// Use the seed to get width/height, if needed...
 
+	if width == 0 && height > 0 { width = height }
+	if height == 0 && width > 0 { height = width }
+
 	if width < 32 || width > 64 || height < 32 || height > 64 {
 		width = 32 + rand.Intn(5) * 8
 		height = width
