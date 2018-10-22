@@ -10,10 +10,11 @@ import (
 type StuffWeWant struct {
 	Players					[]*ReplayPlayer		`json:"players"`
 	ProductionMap			*ReplayMap			`json:"production_map"`
+	Seed					int64				`json:"map_generator_seed"`
 }
 
 
-func FrameFromFile(infile string) *Frame {
+func FrameFromFile(infile string) (*Frame, int64) {
 
 	f, err := os.Open(infile)
 
@@ -75,7 +76,7 @@ func FrameFromFile(infile string) *Frame {
 		frame.halite[x][y] = 0
 	}
 
-	return frame
+	return frame, foo.Seed
 }
 
 

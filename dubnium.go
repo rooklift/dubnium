@@ -101,7 +101,7 @@ func main() {
 	var initial_frame *sim.Frame
 
 	if infile != "" {
-		initial_frame = sim.FrameFromFile(infile)
+		initial_frame, seed = sim.FrameFromFile(infile)
 		width = initial_frame.Width()
 		height = initial_frame.Height()
 	}
@@ -271,7 +271,11 @@ func main() {
 		replay.Stats.Pstats[pid].Rank = game.GetRank(pid)
 	}
 
-	replay.Dump(fmt.Sprintf("replay-%v-%v-%v.hlt", seed, width, height))
+	if infile != "" {
+		replay.Dump(fmt.Sprintf("reload-%v-%v-%v.hlt", seed, width, height))
+	} else {
+		replay.Dump(fmt.Sprintf("replay-%v-%v-%v.hlt", seed, width, height))
+	}
 }
 
 
