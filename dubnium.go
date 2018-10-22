@@ -283,21 +283,21 @@ func parse_args() (int, int, int64, []string) {
 			continue
 		}
 
-		if arg == "--width" {
+		if arg == "--width" || arg == "-w" {
 			dealt_with[n] = true
 			dealt_with[n + 1] = true
 			width, _ = strconv.Atoi(os.Args[n + 1])
 			continue
 		}
 
-		if arg == "--height" {
+		if arg == "--height" || arg == "-h" {
 			dealt_with[n] = true
 			dealt_with[n + 1] = true
 			height, _ = strconv.Atoi(os.Args[n + 1])
 			continue
 		}
 
-		if arg == "-s" {
+		if arg == "--seed" || arg == "-s" {
 			dealt_with[n] = true
 			dealt_with[n + 1] = true
 			seed, _ = strconv.ParseInt(os.Args[n + 1], 10, 64)
