@@ -17,10 +17,10 @@ type StuffWeWant struct {
 func FrameFromFile(infile string) (*Frame, int64) {
 
 	f, err := os.Open(infile)
-
 	if err != nil {
 		panic("Couldn't read infile")
 	}
+	defer f.Close()
 
 	bytes, err := ioutil.ReadAll(f)
 

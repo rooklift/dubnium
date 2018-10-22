@@ -43,11 +43,11 @@ func NewReplay(names []string, game *Game, turns int, seed int64) *Replay {
 func (self *Replay) Dump(filename string) {
 
 	outfile, err := os.Create(filename)
-
 	if err != nil {
 		fmt.Printf("%v\n", err)
 		return
 	}
+	defer outfile.Close()
 
 	enc := json.NewEncoder(outfile)
 	// enc.SetIndent("", "  ")			// Horrifically wasteful
