@@ -261,7 +261,7 @@ func main() {
 		replay.Stats.Pstats[pid].Rank = game.GetRank(pid)
 	}
 
-	replay.Dump("replay.hlt")
+	replay.Dump(fmt.Sprintf("replay-%v-%v-%v.hlt", seed, width, height))
 }
 
 
