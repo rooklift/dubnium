@@ -202,7 +202,6 @@ func main() {
 	for turn := 0; turn <= turns; turn++ {
 
 		update_string, rf := game.UpdateFromMoves(move_strings)
-
 		replay.FullFrames = append(replay.FullFrames, rf)
 
 		for pid := 0; pid < players; pid++ {
@@ -215,18 +214,19 @@ func main() {
 		received_total := 0
 
 		// Count dead players as already received ""
+		// Also do this for all bots on the very final frame.
 
 		for pid := 0; pid < players; pid++ {
-			if crash_list[pid] {
+			if crash_list[pid] || turn == turns {
 				move_strings[pid] = ""
 				received[pid] = true
 				received_total++
 			}
 		}
 
-		deadline := time.NewTimer(2 * time.Second)
-
 		if received_total < players {
+
+			deadline := time.NewTimer(2 * time.Second)
 
 			Wait:
 			for {
@@ -259,8 +259,6 @@ func main() {
 					break Wait
 				}
 			}
-		} else {
-			fmt.Printf("Skipped\n")
 		}
 	}
 
