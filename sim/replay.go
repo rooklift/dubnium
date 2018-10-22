@@ -50,7 +50,7 @@ func (self *Replay) Dump(filename string) {
 	}
 
 	enc := json.NewEncoder(outfile)
-	enc.SetIndent("", "  ")
+	// enc.SetIndent("", "  ")			// Horrifically wasteful
 
 	err = enc.Encode(self)
 

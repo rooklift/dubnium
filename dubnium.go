@@ -199,14 +199,18 @@ func main() {
 
 	move_strings := make([]string, players)
 
-	for turn := 0; turn <= turns; turn++ {
+	for turn := 0; turn <= turns; turn++ {		// Don't mess with this now, we expect <= below...
 
 		update_string, rf := game.UpdateFromMoves(move_strings)
 		replay.FullFrames = append(replay.FullFrames, rf)
 
-		for pid := 0; pid < players; pid++ {
-			if crash_list[pid] == false {
-				io_chans[pid] <- update_string
+		// Send on every turn except final...
+
+		if turn < turns {
+			for pid := 0; pid < players; pid++ {
+				if crash_list[pid] == false {
+					io_chans[pid] <- update_string
+				}
 			}
 		}
 
