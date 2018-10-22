@@ -260,20 +260,20 @@ func (self *Game) UpdateFromMoves(all_player_moves []string) (string, *ReplayFra
 			continue
 		}
 
-		if ship.Halite < new_frame.halite[ship.X][ship.Y] / 10 {			// FIXME: don't hardcode
-			continue
+		if ship.Halite >= new_frame.halite[ship.X][ship.Y] / 10 {		// We can move
+
+			if move != "" && move != "o" && move != "c" {				// We did move
+
+				ship.Halite -= new_frame.halite[ship.X][ship.Y] / 10
+
+				dx, dy := StringToDxDy(move)
+
+				ship.X += dx
+				ship.Y += dy
+				ship.X = Mod(ship.X, self.width)
+				ship.Y = Mod(ship.Y, self.height)
+			}
 		}
-
-		if move != "" && move != "o" && move != "c" {
-			ship.Halite -= new_frame.halite[ship.X][ship.Y] / 10
-		}
-
-		dx, dy := StringToDxDy(move)
-
-		ship.X += dx
-		ship.Y += dy
-		ship.X = Mod(ship.X, self.width)
-		ship.Y = Mod(ship.Y, self.height)
 
 		ship_positions[Position{ship.X, ship.Y}] = append(ship_positions[Position{ship.X, ship.Y}], ship)
 	}
@@ -320,6 +320,7 @@ func (self *Game) UpdateFromMoves(all_player_moves []string) (string, *ReplayFra
 
 			for _, ship := range ships_here {
 				new_frame.ships[ship.Sid] = nil
+				new_frame.halite[x][y] += ship.Halite			// Dump the halite on the ground.
 				wreckedsids = append(wreckedsids, ship.Sid)
 			}
 
@@ -340,22 +341,22 @@ func (self *Game) UpdateFromMoves(all_player_moves []string) (string, *ReplayFra
 		y := dropoff.Y
 		ships_here := ship_positions[Position{x, y}]
 
-		if len(ships_here) > 0 {
+		// First, handle halite that is on the ground (due to collisions)...
 
-			if collision_points[Position{x, y}] {		// We simply get all the halite
+		if new_frame.halite[x][y] > 0 {
+			new_frame.budgets[pid] += new_frame.halite[x][y]
+			new_frame.deposited[pid] += new_frame.halite[x][y]
+			new_frame.halite[x][y] = 0
+		}
 
-				for _, ship := range ships_here {
-					new_frame.budgets[pid] += ship.Halite
-					new_frame.deposited[pid] += ship.Halite
-				}
+		// Now do normal deliveries...
 
-			} else {
+		if len(ships_here) == 1 && collision_points[Position{x, y}] == false {
 
-				if ships_here[0].Owner == pid {
-					new_frame.budgets[pid] += ships_here[0].Halite
-					new_frame.deposited[pid] += ships_here[0].Halite
-					ships_here[0].Halite = 0
-				}
+			if ships_here[0].Owner == pid {
+				new_frame.budgets[pid] += ships_here[0].Halite
+				new_frame.deposited[pid] += ships_here[0].Halite
+				ships_here[0].Halite = 0
 			}
 		}
 	}
