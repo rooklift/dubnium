@@ -96,7 +96,8 @@ func bot_handler(cmd string, pid int, query chan string, io chan string, pregame
 
 func main() {
 
-	width, height, seed, botlist := parse_args()
+	width, height, seed, botlist, _ := parse_args()
+	turns := turns_from_size(width, height)
 
 	players := len(botlist)
 
@@ -115,12 +116,7 @@ func main() {
 
 	crash_list := make([]bool, players)
 
-	// -----------------------------------------------
-
-	turns := 500
-
 	constants := sim.NewConstants(players, width, height, turns, seed)
-
 	game := sim.NewGame(players, width, height, seed, constants)
 
 	json_blob_bytes, _ := json.Marshal(constants)
@@ -255,9 +251,8 @@ func main() {
 		replay.Stats.Pstats = append(replay.Stats.Pstats, new(sim.PlayerStats))
 
 		replay.Stats.Pstats[pid].Pid = pid
-		replay.Stats.Pstats[pid].LastTurnAlive = turns		// FIXME
+		replay.Stats.Pstats[pid].LastTurnAlive = turns					// FIXME
 		replay.Stats.Pstats[pid].HalitePerDropoff = make([]bool, 0)
-
 		replay.Stats.Pstats[pid].Rank = game.GetRank(pid)
 	}
 
@@ -265,13 +260,13 @@ func main() {
 }
 
 
-func parse_args() (int, int, int64, []string) {
+func parse_args() (int, int, int64, []string, string) {
 
 	var botlist []string
+	infile := ""
 
 	width := 0
 	height := 0
-
 	seed := time.Now().UTC().UnixNano()
 
 	dealt_with := make([]bool, len(os.Args))
@@ -303,6 +298,13 @@ func parse_args() (int, int, int64, []string) {
 			seed, _ = strconv.ParseInt(os.Args[n + 1], 10, 64)
 			continue
 		}
+
+		if arg == "--file" || arg == "-f" {
+			dealt_with[n] = true
+			dealt_with[n + 1] = true
+			infile = os.Args[n + 1]
+			continue
+		}
 	}
 
 	for n, arg := range os.Args {
@@ -324,5 +326,16 @@ func parse_args() (int, int, int64, []string) {
 		height = width
 	}
 
-	return width, height, seed, botlist
+	return width, height, seed, botlist, infile
+}
+
+
+func turns_from_size(width, height int) int {
+
+	size := width
+	if height > size {
+		size = height
+	}
+
+	return (((size - 32) * 25) / 8) + 400
 }
