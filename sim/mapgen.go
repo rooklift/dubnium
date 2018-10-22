@@ -4,20 +4,8 @@ import (
 	"math/rand"
 )
 
-func choose_sizes(seed int64) (int, int) {
 
-	rand.Seed(seed)
-
-	r := rand.Intn(5)
-
-	width := 32 + (r * 8)
-	height := width
-
-	return width, height
-}
-
-
-func mapgen(players, width, height int, seed int64) *Frame {
+func MapGen(players, width, height int, seed int64) *Frame {
 
 	rand.Seed(seed)
 

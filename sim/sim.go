@@ -15,6 +15,14 @@ type Frame struct {
 	dropoffs					[]*Dropoff		// The first <player_count> items are always the factories. Index is arbitrary otherwise.
 }
 
+func (self *Frame) Width() int {
+	return len(self.halite)
+}
+
+func (self *Frame) Height() int {
+	return len(self.halite[0])
+}
+
 func (self *Frame) Copy() *Frame {
 
 	new_frame := new(Frame)
@@ -157,9 +165,11 @@ type Game struct {
 	width						int
 	height						int
 
-	death						[]int		// time of death
-
 	frame						*Frame
+}
+
+func (self *Game) UseFrame(f *Frame) {
+	self.frame = f
 }
 
 type Dropoff struct {
@@ -190,16 +200,11 @@ func NewGame(players, width, height int, seed int64, constants *Constants) *Game
 
 	self.Constants = constants
 	self.players = players
-	self.death = make([]int, players)
-
-	if width < 4 || height < 4 {
-		width, height = choose_sizes(seed)
-	}
 
 	self.width = width
 	self.height = height
 
-	self.frame = mapgen(players, width, height, seed)
+	self.frame = nil		// To be set by caller.
 
 	return self
 }

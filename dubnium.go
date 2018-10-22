@@ -96,7 +96,16 @@ func bot_handler(cmd string, pid int, query chan string, io chan string, pregame
 
 func main() {
 
-	width, height, seed, botlist, _ := parse_args()
+	width, height, seed, botlist, infile := parse_args()
+
+	var initial_frame *sim.Frame
+
+	if infile != "" {
+		initial_frame = sim.FrameFromFile(infile)
+		width = initial_frame.Width()
+		height = initial_frame.Height()
+	}
+
 	turns := turns_from_size(width, height)
 
 	players := len(botlist)
@@ -118,6 +127,12 @@ func main() {
 
 	constants := sim.NewConstants(players, width, height, turns, seed)
 	game := sim.NewGame(players, width, height, seed, constants)
+
+	if initial_frame == nil {
+		game.UseFrame(sim.MapGen(players, width, height, seed))
+	} else {
+		game.UseFrame(initial_frame)
+	}
 
 	json_blob_bytes, _ := json.Marshal(constants)
 	json_blob := string(json_blob_bytes)
