@@ -6,6 +6,6 @@ It has been observed to produce 100% consistency with the official engine (using
 
 # Usage:
 
-At this time Dubnium does not really do map generation, so standard usage requires a (decompressed) Halite replay.
+At this time Dubnium does not really do map generation, so standard usage requires a (decompressed) Halite replay to provide the map.
 
 `./dubnium.exe -f replay.json bot1.exe bot2.exe bot3.exe bot4.exe`
