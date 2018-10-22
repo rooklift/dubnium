@@ -1,3 +1,3 @@
 # 🐢 🐊 🦎 🐍
 
-Semi-working alternate *engine* (not bot) for Halite 3.
+Basically-working alternate *engine* (not bot) for Halite 3.
