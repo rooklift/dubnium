@@ -55,7 +55,7 @@ func mapgen(players, width, height int, seed int64) *Frame {
 	if players == 2 {
 		dx = 8
 		dy = 0
-	} else if players == 4 {
+	} else if players > 2 {
 		dx = 8
 		dy = 8
 	}

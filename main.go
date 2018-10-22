@@ -4,8 +4,10 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
+	"math/rand"
 	"os"
 	"os/exec"
+	"strconv"
 	"strings"
 	"time"
 
@@ -94,12 +96,7 @@ func bot_handler(cmd string, pid int, query chan string, io chan string, pregame
 
 func main() {
 
-	var botlist []string
-
-	botlist = append(botlist, "bot.exe")
-	botlist = append(botlist, "bot.exe")
-	botlist = append(botlist, "bot.exe")
-	botlist = append(botlist, "bot.exe")
+	width, height, botlist := parse_args()
 
 	players := len(botlist)
 
@@ -115,8 +112,6 @@ func main() {
 
 	// -----------------------------------------------
 
-	width := 48
-	height := 48
 	turns := 500
 
 	seed := int64(123)
@@ -263,3 +258,53 @@ func main() {
 	replay.Dump("replay.hlt")
 }
 
+
+func parse_args() (int, int, []string) {
+
+	var botlist []string
+
+	width := 32 + rand.Intn(5) * 8
+	height := width
+
+
+	dealt_with := make([]bool, len(os.Args))
+	dealt_with[0] = true
+
+	for n, arg := range os.Args {
+
+		if dealt_with[n] {
+			continue
+		}
+
+		if arg == "--width" {
+			dealt_with[n] = true
+			dealt_with[n + 1] = true
+			width, _ = strconv.Atoi(os.Args[n + 1])
+			continue
+		}
+
+		if arg == "--height" {
+			dealt_with[n] = true
+			dealt_with[n + 1] = true
+			height, _ = strconv.Atoi(os.Args[n + 1])
+			continue
+		}
+
+	}
+
+	for n, arg := range os.Args {
+
+		if dealt_with[n] {
+			continue
+		}
+
+		botlist = append(botlist, arg)
+	}
+
+	if width < 32 { width = 32 }
+	if height < 32 { height = 32 }
+	if width > 64 { width = 64 }
+	if height > 64 { height = 64 }
+
+	return width, height, botlist
+}
