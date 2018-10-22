@@ -96,9 +96,14 @@ func bot_handler(cmd string, pid int, query chan string, io chan string, pregame
 
 func main() {
 
-	width, height, botlist := parse_args()
+	width, height, seed, botlist := parse_args()
 
 	players := len(botlist)
+
+	if players < 1 || players > 4 {
+		fmt.Printf("Bad number of players: %d\n", players)
+		return
+	}
 
 	query_chans := make([]chan string, players)
 	io_chans := make([]chan string, players)
@@ -113,8 +118,6 @@ func main() {
 	// -----------------------------------------------
 
 	turns := 500
-
-	seed := int64(123)
 
 	constants := sim.NewConstants(players, width, height, turns, seed)
 
@@ -139,7 +142,7 @@ func main() {
 	// Get names...
 
 	names_received := 0
-	deadline := time.NewTimer(2 * time.Second)		// Is it 15?
+	deadline := time.NewTimer(30 * time.Second)
 
 	GetNames:
 	for {
@@ -206,35 +209,38 @@ func main() {
 
 		deadline := time.NewTimer(15 * time.Second)
 
-		Wait:
-		for {
+		if received_total < players {
 
-			select {
+			Wait:
+			for {
 
-			case op := <- bot_output_chan:
+				select {
 
-				if crash_list[op.Pid] == false {		// If the bot has officially crashed we already pretended it sent ""
+				case op := <- bot_output_chan:
 
-					received_total++
-					received[op.Pid] = true
-					move_strings[op.Pid] = op.Output
+					if crash_list[op.Pid] == false {		// If the bot has officially crashed we already pretended it sent ""
 
-					if received_total >= players {
-						deadline.Stop()
-						break Wait
+						received_total++
+						received[op.Pid] = true
+						move_strings[op.Pid] = op.Output
+
+						if received_total >= players {
+							deadline.Stop()
+							break Wait
+						}
 					}
-				}
 
-			case <- deadline.C:
+				case <- deadline.C:
 
-				for pid := 0; pid < players; pid++ {
-					if received[pid] == false {
-						move_strings[pid] = ""
-						crash_list[pid] = true
+					for pid := 0; pid < players; pid++ {
+						if received[pid] == false {
+							move_strings[pid] = ""
+							crash_list[pid] = true
+						}
 					}
-				}
 
-				break Wait
+					break Wait
+				}
 			}
 		}
 	}
@@ -259,13 +265,14 @@ func main() {
 }
 
 
-func parse_args() (int, int, []string) {
+func parse_args() (int, int, int64, []string) {
 
 	var botlist []string
 
-	width := 32 + rand.Intn(5) * 8
-	height := width
+	width := 0
+	height := 0
 
+	seed := time.Now().UTC().UnixNano()
 
 	dealt_with := make([]bool, len(os.Args))
 	dealt_with[0] = true
@@ -290,6 +297,12 @@ func parse_args() (int, int, []string) {
 			continue
 		}
 
+		if arg == "-s" {
+			dealt_with[n] = true
+			dealt_with[n + 1] = true
+			seed, _ = strconv.ParseInt(os.Args[n + 1], 10, 64)
+			continue
+		}
 	}
 
 	for n, arg := range os.Args {
@@ -301,10 +314,12 @@ func parse_args() (int, int, []string) {
 		botlist = append(botlist, arg)
 	}
 
-	if width < 32 { width = 32 }
-	if height < 32 { height = 32 }
-	if width > 64 { width = 64 }
-	if height > 64 { height = 64 }
+	rand.Seed(seed)		// Use the seed to get width/height, if needed...
 
-	return width, height, botlist
+	if width < 32 || width > 64 || height < 32 || height > 64 {
+		width = 32 + rand.Intn(5) * 8
+		height = width
+	}
+
+	return width, height, seed, botlist
 }
