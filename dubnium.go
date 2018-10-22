@@ -63,6 +63,7 @@ func bot_handler(cmd string, pid int, query chan string, io chan string, pregame
 	scanner := bufio.NewScanner(o_pipe)		// Is this OK if the exec failed? Probably.
 	if scanner.Scan() == false {
 		fmt.Printf("Bot %d output reached EOF\n", pid)
+		bot_output_chan <- BotOutput{pid, "Non-starter (EOF)"}
 		bot_is_kill = true
 	} else {
 		bot_output_chan <- BotOutput{pid, scanner.Text()}
@@ -185,7 +186,7 @@ func main() {
 
 			for pid := 0; pid < players; pid++ {
 				if player_names[pid] == "" {
-					player_names[pid] = "Non-starter"
+					player_names[pid] = "Non-starter (time)"
 					crash_list[pid] = true
 				}
 			}
@@ -223,7 +224,7 @@ func main() {
 			}
 		}
 
-		deadline := time.NewTimer(15 * time.Second)
+		deadline := time.NewTimer(2 * time.Second)
 
 		if received_total < players {
 
@@ -258,6 +259,8 @@ func main() {
 					break Wait
 				}
 			}
+		} else {
+			fmt.Printf("Skipped\n")
 		}
 	}
 
