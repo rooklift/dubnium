@@ -23,7 +23,7 @@ var bot_output_chan = make(chan BotOutput)		// Shared by all bot handlers.
 
 // -----------------------------------------------------------------------------------------
 
-func bot_handler(cmd string, pid int, query chan string, io chan string, pregame string) {
+func bot_handler(cmd string, pid int, io chan string, pregame string) {
 
 	bot_is_kill := false
 
@@ -71,7 +71,7 @@ func bot_handler(cmd string, pid int, query chan string, io chan string, pregame
 
 	for {
 
-		to_send := <- io
+		to_send := <- io					// Since this blocks, main() must never send via io unless it knows we're alive.
 
 		if bot_is_kill == false {
 
@@ -123,11 +123,9 @@ func main() {
 		return
 	}
 
-	query_chans := make([]chan string, players)
 	io_chans := make([]chan string, players)
 
 	for pid := 0; pid < players; pid++ {
-		query_chans[pid] = make(chan string)
 		io_chans[pid] = make(chan string)
 	}
 
@@ -154,7 +152,7 @@ func main() {
 
 	for pid := 0; pid < players; pid++ {
 		pregame := fmt.Sprintf("%s\n%d %d\n%s", json_blob, players, pid, init_string)
-		go bot_handler(botlist[pid], pid, query_chans[pid], io_chans[pid], pregame)
+		go bot_handler(botlist[pid], pid, io_chans[pid], pregame)
 	}
 
 	var player_names []string
@@ -205,7 +203,7 @@ func main() {
 
 	move_strings := make([]string, players)
 
-	for turn := 0; turn <= turns; turn++ {		// Don't mess with this now, we expect <= below...
+	for turn := 0; turn <= turns; turn++ {				// Don't mess with this now, we expect <= below...
 
 		update_string, rf := game.UpdateFromMoves(move_strings)
 		replay.FullFrames = append(replay.FullFrames, rf)
@@ -215,7 +213,7 @@ func main() {
 		if turn < turns {
 			for pid := 0; pid < players; pid++ {
 				if crash_list[pid] == -1 {
-					io_chans[pid] <- update_string
+					io_chans[pid] <- update_string		// THIS WILL HANG THE ENGINE IF THE HANDLER ISN'T AT THE RIGHT PLACE. Care!
 				}
 			}
 		}
