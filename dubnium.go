@@ -71,7 +71,7 @@ func bot_handler(cmd string, pid int, io chan string, pregame string) {
 
 	for {
 
-		to_send := <- io					// Since this blocks, main() must never send via io unless it knows we're alive.
+		to_send := <- io					// Since this blocks, main() must never send via io unless it knows we made it to here.
 
 		if bot_is_kill == false {
 
