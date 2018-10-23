@@ -270,12 +270,12 @@ func (self *Game) UpdateFromMoves(all_player_moves []string) (string, *ReplayFra
 
 				ship.Halite -= new_frame.halite[ship.X][ship.Y] / 10
 
-				dx, dy := StringToDxDy(move)
+				dx, dy := string_to_dxdy(move)
 
 				ship.X += dx
 				ship.Y += dy
-				ship.X = Mod(ship.X, width)
-				ship.Y = Mod(ship.Y, height)
+				ship.X = mod(ship.X, width)
+				ship.Y = mod(ship.Y, height)
 			}
 		}
 
@@ -447,7 +447,9 @@ func (self *Game) UpdateFromMoves(all_player_moves []string) (string, *ReplayFra
 
 	// Fix inspiration of the new frame...
 
-	new_frame.FixInspiration()
+	new_frame.fix_inspiration(
+		self.Constants.INSPIRATION_RADIUS,
+		self.Constants.INSPIRATION_SHIP_COUNT)
 
 	// Some replay stuff...
 

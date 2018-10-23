@@ -1,6 +1,6 @@
 package sim
 
-type Constants struct {			// This could conceivably change in the engine in future
+type Constants struct {
 
 	CAPTURE_ENABLED				bool
 	CAPTURE_RADIUS				int

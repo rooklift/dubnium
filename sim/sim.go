@@ -93,9 +93,7 @@ func (self *Frame) Copy() *Frame {
 	return new_frame
 }
 
-func (self *Frame) FixInspiration() {
-
-	RADIUS := 4
+func (self *Frame) fix_inspiration(RADIUS int, SHIPS_NEEDED int) {
 
 	width := len(self.halite)
 	height := len(self.halite[0])
@@ -126,8 +124,8 @@ func (self *Frame) FixInspiration() {
 
 			for x := startx; x <= endx; x++ {
 
-				other_x := Mod(ship.X + x, width)
-				other_y := Mod(ship.Y + y, height)
+				other_x := mod(ship.X + x, width)
+				other_y := mod(ship.Y + y, height)
 
 				other := xy_lookup[Position{other_x, other_y}]
 
@@ -139,7 +137,7 @@ func (self *Frame) FixInspiration() {
 
 				if y != 0 {
 
-					other_y = Mod(ship.Y - y, height)
+					other_y = mod(ship.Y - y, height)
 
 					other := xy_lookup[Position{other_x, other_y}]
 
@@ -152,7 +150,7 @@ func (self *Frame) FixInspiration() {
 			}
 		}
 
-		if hits >= 2 {				// FIXME: don't hardcode
+		if hits >= SHIPS_NEEDED {
 			ship.Inspired = true
 		} else {
 			ship.Inspired = false

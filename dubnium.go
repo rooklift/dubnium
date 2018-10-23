@@ -21,6 +21,7 @@ type BotOutput struct {
 
 var bot_output_chan = make(chan BotOutput)		// Shared by all bot handlers.
 
+// -----------------------------------------------------------------------------------------
 
 func bot_handler(cmd string, pid int, query chan string, io chan string, pregame string) {
 
@@ -94,6 +95,8 @@ func bot_handler(cmd string, pid int, query chan string, io chan string, pregame
 		}
 	}
 }
+
+// -----------------------------------------------------------------------------------------
 
 func main() {
 
@@ -288,6 +291,7 @@ func main() {
 	}
 }
 
+// -----------------------------------------------------------------------------------------
 
 func parse_args() (int, int, int64, []string, string) {
 
@@ -358,6 +362,7 @@ func parse_args() (int, int, int64, []string, string) {
 	return width, height, seed, botlist, infile
 }
 
+// -----------------------------------------------------------------------------------------
 
 func turns_from_size(width, height int) int {
 

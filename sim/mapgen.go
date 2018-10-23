@@ -29,11 +29,11 @@ func MapGen(players, width, height int, seed int64) *Frame {
 
 			frame.halite[x][y] += val
 
-			frame.halite[Mod(x + 1, width)][y] += val
-			frame.halite[Mod(x - 1, width)][y] += val
+			frame.halite[mod(x + 1, width)][y] += val
+			frame.halite[mod(x - 1, width)][y] += val
 
-			frame.halite[x][Mod(y + 1, height)] += val
-			frame.halite[x][Mod(y - 1, height)] += val
+			frame.halite[x][mod(y + 1, height)] += val
+			frame.halite[x][mod(y - 1, height)] += val
 		}
 	}
 

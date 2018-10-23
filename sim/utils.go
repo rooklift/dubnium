@@ -1,6 +1,6 @@
 package sim
 
-func StringToDxDy(s string) (int, int) {
+func string_to_dxdy(s string) (int, int) {
 
 	switch s {
 
@@ -20,10 +20,10 @@ func StringToDxDy(s string) (int, int) {
 		return 0, 0
 	}
 
-	panic("StringToDxDy() got illegal string")
+	panic("string_to_dxdy() got illegal string")
 }
 
-func Mod(x, n int) int {
+func mod(x, n int) int {
 
 	// Works for negative x
 	// https://dev.to/maurobringolf/a-neat-trick-to-compute-modulo-of-negative-numbers-111e
