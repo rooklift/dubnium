@@ -1,13 +1,10 @@
 package sim
 
 import (
-	"math/rand"
+	"math"
 )
 
-
 func MapGen(players, width, height, energy int, seed int64) *Frame {
-
-	rand.Seed(seed)
 
 	frame := new(Frame)
 
@@ -22,39 +19,82 @@ func MapGen(players, width, height, energy int, seed int64) *Frame {
 		frame.halite[x] = make([]int, height)
 	}
 
+	noise := make_2d_float_array(width, height)
+
+	p := NewPerlin(2, 2, 20, seed)
+	q := NewPerlin(2, 2, 10, seed)
+	r := NewPerlin(2, 2, 3, seed)
+
+	lowest := 99999.0
+	highest := -99999.0
+
 	for x := 0; x < width; x++ {
 		for y := 0; y < height; y++ {
 
-			val := rand.Intn(128)
+			fx := float64(x) + 0.5
+			fy := float64(y) + 0.5
 
-			frame.halite[x][y] += val
+			dx := math.Abs((float64(width) / 2) - fx) / float64(width / 2)
+			dy := math.Abs((float64(height) / 2) - fy) / float64(height / 2)
 
-			frame.halite[mod(x + 1, width)][y] += val
-			frame.halite[mod(x - 1, width)][y] += val
+			a := q.Noise2D(dx, dy)
+			b := p.Noise2D(dx, dy)
+			c := r.Noise2D(dx, dy)
 
-			frame.halite[x][mod(y + 1, height)] += val
-			frame.halite[x][mod(y - 1, height)] += val
+			noise[x][y] = a + b - c
+
+			if noise[x][y] < lowest { lowest = noise[x][y] }
+			if noise[x][y] > highest { highest = noise[x][y] }
 		}
 	}
 
-	var dx int
-	var dy int
+	// Normalise to a sane range...
 
-	if players == 2 {
-		dx = 8
-		dy = 0
-	} else if players > 2 {
-		dx = 8
-		dy = 8
+	const (
+		MAX_WANTED = 800.0
+		MIN_WANTED = -100.0
+	)
+
+	for x := 0; x < width; x++ {
+		for y := 0; y < height; y++ {
+
+			// Initial normalised value...
+
+			fval := (MAX_WANTED - MIN_WANTED) / (highest - lowest) * (noise[x][y] - highest) + MAX_WANTED
+			frame.halite[x][y] = int(fval)
+
+			if frame.halite[x][y] < 0 {
+				frame.halite[x][y] = 0
+			}
+		}
 	}
+
+	// Place factories...
+
+	dx := 8
+	dy := 8
 
 	for pid := 0; pid < players; pid++ {
 
 		var x int
 		var y int
 
-		if pid % 2 == 0 {
+		if pid == 0 {
 			x = width / 2 - dx - 1
+			y = height / 2 - dy - 1
+		} else if pid == 1 {
+			x = width / 2 + dx
+			y = height / 2 + dy
+		} else if pid == 2 {
+			x = width / 2 - dx - 1
+			y = height / 2 + dy
+		} else {
+			x = width / 2 + dx
+			y = height / 2 - dy - 1
+		}
+
+		if pid % 2 == 0 {
+
 		} else {
 			x = width / 2 + dx
 		}
@@ -79,4 +119,13 @@ func MapGen(players, width, height, energy int, seed int64) *Frame {
 	}
 
 	return frame
+}
+
+
+func make_2d_float_array(width, height int) [][]float64 {
+	ret := make([][]float64, width)
+	for x := 0; x < width; x++ {
+		ret[x] = make([]float64, height)
+	}
+	return ret
 }
