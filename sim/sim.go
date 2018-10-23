@@ -44,13 +44,12 @@ func (self *Frame) Copy() *Frame {
 
 	// ---------------------------------------------------------------
 
-	new_frame.halite = make([][]int, len(self.halite))
-	for x := 0; x < len(self.halite); x++ {
-		new_frame.halite[x] = make([]int, len(self.halite[0]))
-	}
+	width, height := self.Width(), self.Height()
 
-	for x := 0; x < len(self.halite); x++ {
-		for y := 0; y < len(self.halite[0]); y++ {
+	new_frame.halite = make([][]int, width)
+	for x := 0; x < width; x++ {
+		new_frame.halite[x] = make([]int, height)
+		for y := 0; y < height; y++ {
 			new_frame.halite[x][y] = self.halite[x][y]
 		}
 	}
@@ -162,18 +161,73 @@ func (self *Frame) FixInspiration() {
 }
 
 type Game struct {
-
 	Constants					*Constants
-
-	players						int
-	width						int
-	height						int
-
 	frame						*Frame
+}
+
+func NewGame(constants *Constants) *Game {
+
+	self := new(Game)
+
+	self.Constants = constants
+	self.frame = nil				// To be set by caller.
+
+	return self
 }
 
 func (self *Game) UseFrame(f *Frame) {
 	self.frame = f
+}
+
+func (self *Game) BotInitString() string {
+
+	// This returns the string with the factories and map,
+	// but NOT the player count or pid, nor the JSON.
+
+	var lines []string
+
+	for pid := 0; pid < self.frame.Players(); pid++ {
+
+		factory := self.frame.dropoffs[pid]
+		x := factory.X
+		y := factory.Y
+
+		lines = append(lines, fmt.Sprintf("%d %d %d", pid, x, y))
+	}
+
+	lines = append(lines, fmt.Sprintf("%d %d", self.frame.Width(), self.frame.Height()))
+
+	for y := 0; y < self.frame.Height(); y++ {
+
+		var elements []string
+
+		for x := 0; x < self.frame.Width(); x++ {
+			elements = append(elements, strconv.Itoa(self.frame.halite[x][y]))
+		}
+
+		lines = append(lines, strings.Join(elements, " "))
+	}
+
+	return strings.Join(lines, "\n")		// There is no final newline returned.
+}
+
+func (self *Game) GetRank(pid int) int {
+
+	money := self.frame.budgets[pid]
+	rank := 1
+
+	for n := 0; n < self.frame.Players(); n++ {
+
+		if n == pid {
+			continue
+		}
+
+		if self.frame.budgets[n] > money {
+			rank++
+		}
+	}
+
+	return rank
 }
 
 type Dropoff struct {
@@ -196,70 +250,4 @@ type Ship struct {
 type Position struct {
 	X							int		`json:"x"`
 	Y							int		`json:"y"`
-}
-
-func NewGame(players, width, height int, seed int64, constants *Constants) *Game {
-
-	self := new(Game)
-
-	self.Constants = constants
-	self.players = players
-
-	self.width = width
-	self.height = height
-
-	self.frame = nil		// To be set by caller.
-
-	return self
-}
-
-func (self *Game) BotInitString() string {
-
-	// This returns the string with the factories and map,
-	// but NOT the player count or pid, nor the JSON.
-
-	var lines []string
-
-	for pid := 0; pid < self.players; pid++ {
-
-		factory := self.frame.dropoffs[pid]
-		x := factory.X
-		y := factory.Y
-
-		lines = append(lines, fmt.Sprintf("%d %d %d", pid, x, y))
-	}
-
-	lines = append(lines, fmt.Sprintf("%d %d", self.width, self.height))
-
-	for y := 0; y < self.height; y++ {
-
-		var elements []string
-
-		for x := 0; x < self.width; x++ {
-			elements = append(elements, strconv.Itoa(self.frame.halite[x][y]))
-		}
-
-		lines = append(lines, strings.Join(elements, " "))
-	}
-
-	return strings.Join(lines, "\n")		// There is no final newline returned.
-}
-
-func (self *Game) GetRank(pid int) int {
-
-	money := self.frame.budgets[pid]
-	rank := 1
-
-	for n := 0; n < self.players; n++ {
-
-		if n == pid {
-			continue
-		}
-
-		if self.frame.budgets[n] > money {
-			rank++
-		}
-	}
-
-	return rank
 }

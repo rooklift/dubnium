@@ -99,20 +99,20 @@ func main() {
 
 	width, height, seed, botlist, infile := parse_args()
 
-	var initial_frame *sim.Frame
+	var provided_frame *sim.Frame
 
 	if infile != "" {
-		initial_frame, seed = sim.FrameFromFile(infile)
-		width = initial_frame.Width()
-		height = initial_frame.Height()
+		provided_frame, seed = sim.FrameFromFile(infile)
+		width = provided_frame.Width()
+		height = provided_frame.Height()
 	}
 
 	turns := turns_from_size(width, height)
 
 	players := len(botlist)
 
-	if initial_frame != nil && initial_frame.Players() != players {
-		fmt.Printf("Wrong number of bots (%d) given for this replay (need %d)\n", players, initial_frame.Players())
+	if provided_frame != nil && provided_frame.Players() != players {
+		fmt.Printf("Wrong number of bots (%d) given for this replay (need %d)\n", players, provided_frame.Players())
 		return
 	}
 
@@ -132,12 +132,12 @@ func main() {
 	crash_list := make([]bool, players)
 
 	constants := sim.NewConstants(players, width, height, turns, seed)
-	game := sim.NewGame(players, width, height, seed, constants)
+	game := sim.NewGame(constants)
 
-	if initial_frame == nil {
+	if provided_frame == nil {
 		game.UseFrame(sim.MapGen(players, width, height, seed))
 	} else {
-		game.UseFrame(initial_frame)
+		game.UseFrame(provided_frame)
 	}
 
 	json_blob_bytes, _ := json.Marshal(constants)

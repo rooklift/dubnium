@@ -8,8 +8,12 @@ import (
 
 func (self *Game) UpdateFromMoves(all_player_moves []string) (string, *ReplayFrame) {
 
-	if len(all_player_moves) != self.players {
-		panic("len(all_player_moves) != self.players")
+	players := self.frame.Players()
+	width := self.frame.Width()
+	height := self.frame.Height()
+
+	if len(all_player_moves) != players {
+		panic("len(all_player_moves) != players")
 	}
 
 	rf := new(ReplayFrame)
@@ -21,7 +25,7 @@ func (self *Game) UpdateFromMoves(all_player_moves []string) (string, *ReplayFra
 	rf.Events = make([]*ReplayEvent, 0)
 	rf.Moves = make(map[int][]*ReplayMove)
 
-	for pid := 0; pid < self.players; pid++ {
+	for pid := 0; pid < players; pid++ {
 		rf.Entities[pid] = make(map[int]*Ship)
 	}
 
@@ -34,7 +38,7 @@ func (self *Game) UpdateFromMoves(all_player_moves []string) (string, *ReplayFra
 		rf.Entities[ship.Owner][ship.Sid] = ship
 	}
 
-	for pid := 0; pid < self.players; pid++ {
+	for pid := 0; pid < players; pid++ {
 		rf.Moves[pid] = make([]*ReplayMove, 0)
 	}
 
@@ -152,7 +156,7 @@ func (self *Game) UpdateFromMoves(all_player_moves []string) (string, *ReplayFra
 
 	// Adjust budgets...
 
-	for pid := 0; pid < self.players; pid++ {
+	for pid := 0; pid < players; pid++ {
 		if gens[pid] {
 			new_frame.budgets[pid] -= 1000		// FIXME: don't hardcode
 		}
@@ -171,7 +175,7 @@ func (self *Game) UpdateFromMoves(all_player_moves []string) (string, *ReplayFra
 		}
 	}
 
-	for pid := 0; pid < self.players; pid++ {
+	for pid := 0; pid < players; pid++ {
 		if new_frame.budgets[pid] < 0 {
 			fails[pid] = "Went over budget"
 		}
@@ -179,7 +183,7 @@ func (self *Game) UpdateFromMoves(all_player_moves []string) (string, *ReplayFra
 
 	// Print info on fails...
 
-	for pid := 0; pid < self.players; pid++ {
+	for pid := 0; pid < players; pid++ {
 		if fails[pid] != "" {
 			fmt.Printf("%s\n", fails[pid])
 		}
@@ -187,7 +191,7 @@ func (self *Game) UpdateFromMoves(all_player_moves []string) (string, *ReplayFra
 
 	// Clear gens / budgets of dying players...
 
-	for pid := 0; pid < self.players; pid++ {
+	for pid := 0; pid < players; pid++ {
 		if fails[pid] != "" {
 			gens[pid] = false
 			new_frame.budgets[pid] = 0
@@ -270,8 +274,8 @@ func (self *Game) UpdateFromMoves(all_player_moves []string) (string, *ReplayFra
 
 				ship.X += dx
 				ship.Y += dy
-				ship.X = Mod(ship.X, self.width)
-				ship.Y = Mod(ship.Y, self.height)
+				ship.X = Mod(ship.X, width)
+				ship.Y = Mod(ship.Y, height)
 			}
 		}
 
@@ -282,7 +286,7 @@ func (self *Game) UpdateFromMoves(all_player_moves []string) (string, *ReplayFra
 
 	attempted_spawn_points := make(map[Position]bool)
 
-	for pid := 0; pid < self.players; pid++ {
+	for pid := 0; pid < players; pid++ {
 
 		if gens[pid] {
 
@@ -298,9 +302,9 @@ func (self *Game) UpdateFromMoves(all_player_moves []string) (string, *ReplayFra
 
 	collision_points := make(map[Position]bool)
 
-	for x := 0; x < self.width; x++ {
+	for x := 0; x < width; x++ {
 
-		for y := 0; y < self.height; y++ {
+		for y := 0; y < height; y++ {
 
 			ships_here := ship_positions[Position{x, y}]
 
@@ -363,7 +367,7 @@ func (self *Game) UpdateFromMoves(all_player_moves []string) (string, *ReplayFra
 
 	// Gen...
 
-	for pid := 0; pid < self.players; pid++ {
+	for pid := 0; pid < players; pid++ {
 
 		if gens[pid] {
 
@@ -447,7 +451,7 @@ func (self *Game) UpdateFromMoves(all_player_moves []string) (string, *ReplayFra
 
 	// Some replay stuff...
 
-	for pid := 0; pid < self.players; pid++ {
+	for pid := 0; pid < players; pid++ {
 		if fails[pid] != "" {
 			continue
 		}
@@ -480,11 +484,11 @@ func (self *Game) UpdateFromMoves(all_player_moves []string) (string, *ReplayFra
 
 	rf.Cells = make_cell_updates(self.frame, new_frame)
 
-	for pid := 0; pid < self.players; pid++ {
+	for pid := 0; pid < players; pid++ {
 		rf.Energy[pid] = new_frame.budgets[pid]
 	}
 
-	for pid := 0; pid < self.players; pid++ {
+	for pid := 0; pid < players; pid++ {
 		rf.Deposited[pid] = new_frame.deposited[pid]
 	}
 

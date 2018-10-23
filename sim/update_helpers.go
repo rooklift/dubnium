@@ -10,9 +10,9 @@ func make_bot_update_string(old, current *Frame) string {
 
 	// The string to send to a bot after the turn (before the next turn, whatever)
 
-	players := len(current.budgets)
-	width := len(current.halite)
-	height := len(current.halite[0])
+	players := current.Players()
+	width := current.Width()
+	height := current.Height()
 
 	var lines []string
 
@@ -98,8 +98,8 @@ func make_cell_updates(old, current *Frame) []*CellUpdate {
 
 	ret := make([]*CellUpdate, 0)
 
-	width := len(current.halite)
-	height := len(current.halite[0])
+	width := current.Width()
+	height := current.Height()
 
 	for x := 0; x < width; x++ {
 		for y := 0; y < height; y++ {

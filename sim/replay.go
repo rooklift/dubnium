@@ -28,9 +28,9 @@ func NewReplay(names []string, game *Game, turns int, seed int64) *Replay {
 	self.Constants = game.Constants
 	self.FileVersion = 3
 	self.Seed = seed
-	self.NumPlayers = game.players
+	self.NumPlayers = game.frame.Players()
 
-	for pid := 0; pid < game.players; pid++ {
+	for pid := 0; pid < self.NumPlayers; pid++ {
 		player := NewReplayPlayer(names[pid], pid, game)
 		self.Players = append(self.Players, player)
 	}
@@ -159,8 +159,8 @@ func ReplayMapFromFrame(frame *Frame) *ReplayMap {
 
 	self := new(ReplayMap)
 
-	self.Width = len(frame.halite)
-	self.Height = len(frame.halite[0])
+	self.Width = frame.Width()
+	self.Height = frame.Height()
 
 	// Note y/x format...
 
