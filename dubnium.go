@@ -30,6 +30,9 @@ func bot_handler(cmd string, pid int, query chan string, io chan string, pregame
 	cmd_split := strings.Fields(cmd)
 	exec_command := exec.Command(cmd_split[0], cmd_split[1:]...)
 
+	// Note that the command isn't run until we call .Start()
+	// So the following is just setup for that and shouldn't fail.
+
 	i_pipe, err := exec_command.StdinPipe()
 	if err != nil {
 		fmt.Printf("%v\n", err)
@@ -41,13 +44,9 @@ func bot_handler(cmd string, pid int, query chan string, io chan string, pregame
 		fmt.Printf("%v\n", err)
 		os.Exit(1)
 	}
-/*
-	e_pipe, err := exec_command.StderrPipe()
-	if err != nil {
-		fmt.Printf("%v\n", err)
-		os.Exit(1)
-	}
-*/
+
+	// No need to have a stderr pipe; without one it will go to /dev/null
+
 	err = exec_command.Start()
 	if err != nil {
 		fmt.Printf("Failed to start bot %d (%s)\n", pid, cmd)
