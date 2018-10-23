@@ -8,6 +8,7 @@ import (
 
 
 type StuffWeWant struct {
+	Constants				*Constants			`json:"GAME_CONSTANTS"`			// Solely used to get initial energy (5000)
 	Players					[]*ReplayPlayer		`json:"players"`
 	ProductionMap			*ReplayMap			`json:"production_map"`
 	Seed					int64				`json:"map_generator_seed"`
@@ -43,7 +44,7 @@ func FrameFromFile(infile string) (*Frame, int64) {
 	frame := new(Frame)
 
 	for pid := 0; pid < players; pid++ {
-		frame.budgets = append(frame.budgets, 5000)						// FIXME: don't hardcode
+		frame.budgets = append(frame.budgets, foo.Constants.INITIAL_ENERGY)
 		frame.deposited = append(frame.deposited, 0)
 	}
 

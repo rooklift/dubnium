@@ -158,7 +158,7 @@ func (self *Game) UpdateFromMoves(all_player_moves []string) (string, *ReplayFra
 
 	for pid := 0; pid < players; pid++ {
 		if gens[pid] {
-			new_frame.budgets[pid] -= 1000		// FIXME: don't hardcode
+			new_frame.budgets[pid] -= self.Constants.NEW_ENTITY_ENERGY_COST
 		}
 	}
 
@@ -169,7 +169,7 @@ func (self *Game) UpdateFromMoves(all_player_moves []string) (string, *ReplayFra
 			ship := new_frame.ships[sid]		// Note we already checked this sid exists and is not nil.
 			pid := ship.Owner
 
-			new_frame.budgets[pid] -= 4000		// FIXME: don't hardcode
+			new_frame.budgets[pid] -= self.Constants.DROPOFF_COST
 			new_frame.budgets[pid] += ship.Halite
 			new_frame.budgets[pid] += new_frame.halite[ship.X][ship.Y]
 		}
@@ -405,6 +405,8 @@ func (self *Game) UpdateFromMoves(all_player_moves []string) (string, *ReplayFra
 
 	// Mining...
 
+	ibm := int(self.Constants.INSPIRED_BONUS_MULTIPLIER)		// May be a float in replays but we'll only accept ints
+
 	for sid, ship := range new_frame.ships {
 
 		if ship == nil {
@@ -421,10 +423,10 @@ func (self *Game) UpdateFromMoves(all_player_moves []string) (string, *ReplayFra
 
 			// Normal mining...
 
-			amount_to_mine := (new_frame.halite[ship.X][ship.Y] + 3) / 4		// FIXME, don't hardcode, round properly
+			amount_to_mine := (new_frame.halite[ship.X][ship.Y] + self.Constants.EXTRACT_RATIO - 1) / self.Constants.EXTRACT_RATIO
 
-			if amount_to_mine + ship.Halite >= 1000 {
-				amount_to_mine = 1000 - ship.Halite
+			if amount_to_mine + ship.Halite >= self.Constants.MAX_ENERGY {
+				amount_to_mine = self.Constants.MAX_ENERGY - ship.Halite
 			}
 
 			ship.Halite += amount_to_mine
@@ -434,10 +436,10 @@ func (self *Game) UpdateFromMoves(all_player_moves []string) (string, *ReplayFra
 
 			if ship.Inspired {
 
-				inspired_bonus := amount_to_mine * 2
+				inspired_bonus := amount_to_mine * ibm
 
-				if inspired_bonus + ship.Halite >= 1000 {
-					inspired_bonus = 1000 - ship.Halite
+				if inspired_bonus + ship.Halite >= self.Constants.MAX_ENERGY {
+					inspired_bonus = self.Constants.MAX_ENERGY - ship.Halite
 				}
 
 				ship.Halite += inspired_bonus

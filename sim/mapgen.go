@@ -5,14 +5,14 @@ import (
 )
 
 
-func MapGen(players, width, height int, seed int64) *Frame {
+func MapGen(players, width, height, energy int, seed int64) *Frame {
 
 	rand.Seed(seed)
 
 	frame := new(Frame)
 
 	for pid := 0; pid < players; pid++ {
-		frame.budgets = append(frame.budgets, 5000)		// FIXME: don't hardcode
+		frame.budgets = append(frame.budgets, energy)
 		frame.deposited = append(frame.deposited, 0)
 	}
 

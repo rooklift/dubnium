@@ -132,13 +132,17 @@ func main() {
 		io_chans[pid] = make(chan string)
 	}
 
-	crash_list := make([]bool, players)
+	var crash_list []int
+
+	for pid := 0; pid < players; pid++ {
+		crash_list = append(crash_list, -1)
+	}
 
 	constants := sim.NewConstants(players, width, height, turns, seed)
 	game := sim.NewGame(constants)
 
 	if provided_frame == nil {
-		game.UseFrame(sim.MapGen(players, width, height, seed))
+		game.UseFrame(sim.MapGen(players, width, height, constants.INITIAL_ENERGY, seed))
 	} else {
 		game.UseFrame(provided_frame)
 	}
@@ -190,7 +194,7 @@ func main() {
 			for pid := 0; pid < players; pid++ {
 				if player_names[pid] == "" {
 					player_names[pid] = "Non-starter (time)"
-					crash_list[pid] = true
+					crash_list[pid] = 0
 				}
 			}
 
@@ -211,7 +215,7 @@ func main() {
 
 		if turn < turns {
 			for pid := 0; pid < players; pid++ {
-				if crash_list[pid] == false {
+				if crash_list[pid] == -1 {
 					io_chans[pid] <- update_string
 				}
 			}
@@ -224,7 +228,7 @@ func main() {
 		// Also do this for all bots on the very final frame.
 
 		for pid := 0; pid < players; pid++ {
-			if crash_list[pid] || turn == turns {
+			if crash_list[pid] != -1 || turn == turns {
 				move_strings[pid] = ""
 				received[pid] = true
 				received_total++
@@ -242,7 +246,7 @@ func main() {
 
 				case op := <- bot_output_chan:
 
-					if crash_list[op.Pid] == false {		// If the bot has officially crashed we already pretended it sent ""
+					if crash_list[op.Pid] == -1 {		// Bot hasn't crashed (if it had, we already pretended it sent "")
 
 						received_total++
 						received[op.Pid] = true
@@ -259,7 +263,7 @@ func main() {
 					for pid := 0; pid < players; pid++ {
 						if received[pid] == false {
 							move_strings[pid] = ""
-							crash_list[pid] = true
+							crash_list[pid] = turn
 						}
 					}
 
@@ -277,11 +281,16 @@ func main() {
 	for pid := 0; pid < players; pid++ {
 
 		replay.Stats.Pstats = append(replay.Stats.Pstats, new(sim.PlayerStats))
-
 		replay.Stats.Pstats[pid].Pid = pid
-		replay.Stats.Pstats[pid].LastTurnAlive = turns					// FIXME
 		replay.Stats.Pstats[pid].HalitePerDropoff = make([]bool, 0)
 		replay.Stats.Pstats[pid].Rank = game.GetRank(pid)
+
+		turn_last_alive := turns + 1		// Like in official replays
+		if crash_list[pid] != -1 {
+			turn_last_alive = crash_list[pid]
+		}
+
+		replay.Stats.Pstats[pid].LastTurnAlive = turn_last_alive
 	}
 
 	if infile != "" {
