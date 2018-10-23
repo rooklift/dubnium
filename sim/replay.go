@@ -6,6 +6,8 @@ import (
 	"os"
 )
 
+const PRETTY_PRINT = false
+
 type Replay struct {
 
 	EngineVersion				string				`json:"ENGINE_VERSION"`
@@ -50,7 +52,10 @@ func (self *Replay) Dump(filename string) {
 	defer outfile.Close()
 
 	enc := json.NewEncoder(outfile)
-	// enc.SetIndent("", "  ")			// Horrifically wasteful
+
+	if PRETTY_PRINT {
+		enc.SetIndent("", "\t")			// Horrifically wasteful
+	}
 
 	err = enc.Encode(self)
 

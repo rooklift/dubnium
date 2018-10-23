@@ -237,6 +237,10 @@ func (self *Game) GetDropoffs() []*Dropoff {				// Needed for replay stats
 	return ret
 }
 
+func (self *Game) Budget(pid int) int {
+	return self.frame.budgets[pid]
+}
+
 type Dropoff struct {
 	Factory						bool
 	Owner						int

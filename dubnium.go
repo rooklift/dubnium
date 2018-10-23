@@ -277,12 +277,15 @@ func main() {
 	replay.FullFrames = append(replay.FullFrames, rf)
 
 	replay.Stats = new(sim.ReplayStats)
+	replay.Stats.NumTurns = turns + 1
 
 	for pid := 0; pid < players; pid++ {
 
 		replay.Stats.Pstats = append(replay.Stats.Pstats, new(sim.PlayerStats))
 		replay.Stats.Pstats[pid].Pid = pid
 		replay.Stats.Pstats[pid].Rank = game.GetRank(pid)
+
+		replay.Stats.Pstats[pid].FinalProduction = game.Budget(pid)
 
 		turn_last_alive := turns + 1		// Like in official replays
 		if crash_list[pid] != -1 {
@@ -296,6 +299,12 @@ func main() {
 
 	for _, dropoff := range all_dropoffs {
 		replay.Stats.Pstats[dropoff.Owner].HalitePerDropoff = append(replay.Stats.Pstats[dropoff.Owner].HalitePerDropoff, dropoff)
+
+		replay.Stats.Pstats[dropoff.Owner].TotalProduction += dropoff.Gathered
+
+		if dropoff.Factory == false {
+			replay.Stats.Pstats[dropoff.Owner].NumDropoffs += 1
+		}
 	}
 
 	if infile != "" {
