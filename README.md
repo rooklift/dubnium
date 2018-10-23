@@ -6,6 +6,6 @@ It has been observed to produce 100% consistency with the official engine (using
 
 # Usage:
 
-Dubnium has its own half-baked mapgen, but you can also load the map from a replay, like so:
+Dubnium has its own half-baked mapgen, but you can also load the map from a (decompressed, plain-JSON) replay:
 
 `./dubnium.exe -f replay.json bot1.exe bot2.exe bot3.exe bot4.exe`
