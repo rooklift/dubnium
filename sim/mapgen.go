@@ -54,13 +54,13 @@ func MapGen(players, width, height, energy int, seed int64) *Frame {
 		var y int
 
 		if pid % 2 == 0 {
-			x = width / 2 - dx
+			x = width / 2 - dx - 1
 		} else {
 			x = width / 2 + dx
 		}
 
 		if pid < players / 2 {
-			y = height / 2 - dy
+			y = height / 2 - dy - 1
 		} else {
 			y = height / 2 + dy
 		}
