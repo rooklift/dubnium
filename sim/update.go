@@ -234,6 +234,7 @@ func (self *Game) UpdateFromMoves(all_player_moves []string) (string, *ReplayFra
 			Sid: ship.Sid,
 			X: ship.X,
 			Y: ship.Y,
+			Gathered: ship.Halite + new_frame.halite[ship.X][ship.Y],		// Absorbed + ship contents
 		}
 
 		new_frame.dropoffs = append(new_frame.dropoffs, dropoff)
@@ -347,9 +348,12 @@ func (self *Game) UpdateFromMoves(all_player_moves []string) (string, *ReplayFra
 
 		// First, handle halite that is on the ground (due to collisions)...
 
-		if new_frame.halite[x][y] > 0 {
-			new_frame.budgets[pid] += new_frame.halite[x][y]
-			new_frame.deposited[pid] += new_frame.halite[x][y]
+		halite_on_ground := new_frame.halite[x][y]
+
+		if halite_on_ground > 0 {
+			dropoff.Gathered += halite_on_ground
+			new_frame.budgets[pid] += halite_on_ground
+			new_frame.deposited[pid] += halite_on_ground
 			new_frame.halite[x][y] = 0
 		}
 
@@ -358,6 +362,7 @@ func (self *Game) UpdateFromMoves(all_player_moves []string) (string, *ReplayFra
 		if len(ships_here) == 1 && collision_points[Position{x, y}] == false {
 
 			if ships_here[0].Owner == pid {
+				dropoff.Gathered += ships_here[0].Halite
 				new_frame.budgets[pid] += ships_here[0].Halite
 				new_frame.deposited[pid] += ships_here[0].Halite
 				ships_here[0].Halite = 0

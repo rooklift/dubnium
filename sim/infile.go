@@ -71,6 +71,7 @@ func FrameFromFile(infile string) (*Frame, int64) {
 			Sid: -1,
 			X: x,
 			Y: y,
+			Gathered: 0,
 		}
 
 		frame.dropoffs = append(frame.dropoffs, factory)

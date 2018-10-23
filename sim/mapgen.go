@@ -71,6 +71,7 @@ func MapGen(players, width, height, energy int, seed int64) *Frame {
 			Sid: -1,
 			X: x,
 			Y: y,
+			Gathered: 0,
 		}
 
 		frame.dropoffs = append(frame.dropoffs, factory)

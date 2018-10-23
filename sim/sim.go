@@ -85,6 +85,7 @@ func (self *Frame) Copy() *Frame {
 			Sid: dropoff.Sid,
 			X: dropoff.X,
 			Y: dropoff.Y,
+			Gathered: dropoff.Gathered,
 		}
 
 		new_frame.dropoffs = append(new_frame.dropoffs, dropoff_copy)
@@ -228,12 +229,21 @@ func (self *Game) GetRank(pid int) int {
 	return rank
 }
 
+func (self *Game) GetDropoffs() []*Dropoff {				// Needed for replay stats
+	var ret []*Dropoff
+	for _, dropoff := range self.frame.dropoffs {
+		ret = append(ret, dropoff)
+	}
+	return ret
+}
+
 type Dropoff struct {
 	Factory						bool
 	Owner						int
 	Sid							int			// Make this -1 if factory I guess (official engine does this too)
 	X							int
 	Y							int
+	Gathered					int			// Halite gathered here - for stats
 }
 
 type Ship struct {

@@ -282,7 +282,6 @@ func main() {
 
 		replay.Stats.Pstats = append(replay.Stats.Pstats, new(sim.PlayerStats))
 		replay.Stats.Pstats[pid].Pid = pid
-		replay.Stats.Pstats[pid].HalitePerDropoff = make([]bool, 0)
 		replay.Stats.Pstats[pid].Rank = game.GetRank(pid)
 
 		turn_last_alive := turns + 1		// Like in official replays
@@ -291,6 +290,12 @@ func main() {
 		}
 
 		replay.Stats.Pstats[pid].LastTurnAlive = turn_last_alive
+	}
+
+	all_dropoffs := game.GetDropoffs()
+
+	for _, dropoff := range all_dropoffs {
+		replay.Stats.Pstats[dropoff.Owner].HalitePerDropoff = append(replay.Stats.Pstats[dropoff.Owner].HalitePerDropoff, dropoff)
 	}
 
 	if infile != "" {

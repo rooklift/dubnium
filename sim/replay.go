@@ -127,7 +127,7 @@ type PlayerStats struct {
 	AllCollisions			int							`json:"all_collisions"`
 	AvgEntityDist			int							`json:"average_entity_distance"`
 	FinalProduction			int							`json:"final_production"`
-	HalitePerDropoff		[]bool						`json:"halite_per_dropoff"`				// Just gonna leave this empty
+	HalitePerDropoff		[]*Dropoff					`json:"halite_per_dropoff"`		// a bit magical - the dropoff implements custom marshaler
 	InteractionOpps			int							`json:"interaction_opportunities"`
 	LastTurnAlive			int							`json:"last_turn_alive"`
 	MaxEntityDist			int							`json:"max_entity_distance"`
@@ -177,4 +177,8 @@ func ReplayMapFromFrame(frame *Frame) *ReplayMap {
 	}
 
 	return self
+}
+
+func (d Dropoff) MarshalJSON() ([]byte, error) {		// Strictly for replay halite_per_dropoff stat.
+	return []byte(fmt.Sprintf(`[{"x":%d,"y":%d},%d]`, d.X, d.Y, d.Gathered)), nil
 }
