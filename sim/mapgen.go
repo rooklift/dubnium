@@ -2,9 +2,12 @@ package sim
 
 import (
 	"math"
+	"math/rand"
 )
 
 func MapGen(players, width, height, energy int, seed int32) *Frame {
+
+	rand.Seed(int64(seed))
 
 	frame := new(Frame)
 
@@ -15,11 +18,13 @@ func MapGen(players, width, height, energy int, seed int32) *Frame {
 
 	frame.halite = make_2d_int_array(width, height)
 
-	noise := make_2d_float_array(width, height)
+	// ----------------------------------------------------------------------------------------------------
 
-	p := NewPerlin(2, 2, 20, int64(seed))
-	q := NewPerlin(2, 2, 10, int64(seed))
-	r := NewPerlin(2, 2, 3, int64(seed))
+	smooth_basis := smooth_noise(width, height, 1)		// Do we need this? Official has something similar.
+
+	float_map := make_2d_float_array(width, height)
+
+	p := NewPerlin(2, 2, 7, int64(seed))
 
 	lowest := 99999.0
 	highest := -99999.0
@@ -33,30 +38,25 @@ func MapGen(players, width, height, energy int, seed int32) *Frame {
 			dx := math.Abs((float64(width) / 2) - fx) / float64(width / 2)
 			dy := math.Abs((float64(height) / 2) - fy) / float64(height / 2)
 
-			a := q.Noise2D(dx, dy)
-			b := p.Noise2D(dx, dy)
-			c := r.Noise2D(dx, dy)
+			initial := p.Noise2D(dx, dy) * smooth_basis[x][y]
+			float_map[x][y] = math.Pow(initial, 2)
 
-			noise[x][y] = a + b - c
-
-			if noise[x][y] < lowest { lowest = noise[x][y] }
-			if noise[x][y] > highest { highest = noise[x][y] }
+			if float_map[x][y] < lowest { lowest = float_map[x][y] }
+			if float_map[x][y] > highest { highest = float_map[x][y] }
 		}
 	}
 
 	// Normalise to a sane range...
 
 	const (
-		MAX_WANTED = 800.0
-		MIN_WANTED = -300.0
+		MAX_WANTED = 1000.0
+		MIN_WANTED = 0.0
 	)
 
 	for x := 0; x < width; x++ {
 		for y := 0; y < height; y++ {
 
-			// Initial normalised value...
-
-			fval := (MAX_WANTED - MIN_WANTED) / (highest - lowest) * (noise[x][y] - highest) + MAX_WANTED
+			fval := (MAX_WANTED - MIN_WANTED) / (highest - lowest) * (float_map[x][y] - highest) + MAX_WANTED
 			frame.halite[x][y] = int(fval)
 
 			if frame.halite[x][y] < 0 {
@@ -65,7 +65,7 @@ func MapGen(players, width, height, energy int, seed int32) *Frame {
 		}
 	}
 
-	// Place factories...
+	// ----------------------------------------------------------------------------------------------------
 
 	dx := 8
 	dy := 8
@@ -105,3 +105,71 @@ func MapGen(players, width, height, energy int, seed int32) *Frame {
 	return frame
 }
 
+
+func smooth_noise(width, height, cycles int) [][]float64 {
+
+	noisemap := make_2d_float_array(width, height)
+
+	for x := 0; x < width; x++ {
+		for y := 0; y < height; y++ {
+			noisemap[x][y] = rand.Float64()
+		}
+	}
+
+	for n := 0; n < cycles; n++ {
+
+		next_phase := make_2d_float_array(width, height)
+
+		for x := 0; x < width; x++ {
+			for y := 0; y < height; y++ {
+				neighbours := neighbours8(x, y, width, height)
+				var sum float64
+				for _, neigh := range neighbours {
+					sum += noisemap[neigh.X][neigh.Y]
+				}
+				next_phase[x][y] = sum / float64(len(neighbours))
+			}
+		}
+
+		noisemap = next_phase
+	}
+
+	// Make the whole thing symmetric... (which renders a lot of the above work pointless, but meh)
+
+	for x := 0; x < width / 2; x++ {
+
+		for y := 0; y < height / 2; y++ {
+
+			val := noisemap[x][y]
+
+			noisemap[width - 1 - x][y] = val
+			noisemap[x][height - 1 - y] = val
+			noisemap[width - 1 - x][height - 1 - y] = val
+
+		}
+	}
+
+	return noisemap
+}
+
+
+func neighbours8(x, y, width, height int) []Position {
+
+	var ret []Position
+
+	ret = append(ret, Position{x - 1, y - 1})
+	ret = append(ret, Position{x - 1, y + 0})
+	ret = append(ret, Position{x - 1, y + 1})
+	ret = append(ret, Position{x + 0, y - 1})
+	ret = append(ret, Position{x + 0, y + 1})
+	ret = append(ret, Position{x + 1, y - 1})
+	ret = append(ret, Position{x + 1, y + 0})
+	ret = append(ret, Position{x + 1, y + 1})
+
+	for n := 0; n < len(ret); n++ {
+		ret[n].X = mod(ret[n].X, width)
+		ret[n].Y = mod(ret[n].Y, height)
+	}
+
+	return ret
+}
