@@ -382,7 +382,7 @@ func parse_args() (width, height int, seed int32, no_timeout bool, botlist []str
 	if width == 0 && height > 0 { width = height }
 	if height == 0 && width > 0 { height = width }
 
-	if width < 32 || width > 64 || height < 32 || height > 64 {
+	if width < 16 || width > 64 || height < 16 || height > 64 {
 		width = 32 + rand.Intn(5) * 8
 		height = width
 	}

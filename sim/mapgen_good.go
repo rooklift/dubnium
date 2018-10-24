@@ -26,6 +26,9 @@ func MapGenOfficial(players, width, height, player_energy int, seed int32) *Fram
 	tile_width := width / 2		// FIXME: consider odd-sized maps
 	tile_height := height / 2
 
+	if width % 2 == 1 { tile_width += 1 }
+	if height % 2 == 1 { tile_height += 1 }
+
 	tile := make_tile(tile_width, tile_height, 950)
 
 	for x := 0; x < tile_width; x++ {
@@ -154,26 +157,23 @@ func place_factories(frame *Frame, players int) {
 
 	frame.dropoffs = nil
 
-	dx := 8
-	dy := 8
-
 	for pid := 0; pid < players; pid++ {
 
 		var x int
 		var y int
 
 		if pid == 0 {
-			x = width / 2 - dx - 1
-			y = height / 2 - dy - 1
+			x = width / 4
+			y = height / 4
 		} else if pid == 1 {
-			x = width / 2 + dx
-			y = height / 2 + dy
+			x = width - 1 - width / 4
+			y = height / 4
 		} else if pid == 2 {
-			x = width / 2 - dx - 1
-			y = height / 2 + dy
+			x = width / 4
+			y = height - 1 - height / 4
 		} else {
-			x = width / 2 + dx
-			y = height / 2 - dy - 1
+			x = width - 1 - width / 4
+			y = height - 1 - height / 4
 		}
 
 		factory := &Dropoff{
