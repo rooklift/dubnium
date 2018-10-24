@@ -185,7 +185,7 @@ func main() {
 		case <- deadline.C:
 
 			if no_timeout {
-				continue
+				continue GetNames
 			}
 
 			fmt.Fprintf(os.Stderr, "Hit the deadline. Received: %d\n", names_received)
@@ -260,7 +260,7 @@ func main() {
 				case <- deadline.C:
 
 					if no_timeout {
-						continue
+						continue Wait
 					}
 
 					for pid := 0; pid < players; pid++ {
