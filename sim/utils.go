@@ -30,3 +30,19 @@ func mod(x, n int) int {
 
 	return (x % n + n) % n
 }
+
+func make_2d_float_array(width, height int) [][]float64 {
+	ret := make([][]float64, width)
+	for x := 0; x < width; x++ {
+		ret[x] = make([]float64, height)
+	}
+	return ret
+}
+
+func make_2d_int_array(width, height int) [][]int {
+	ret := make([][]int, width)
+	for x := 0; x < width; x++ {
+		ret[x] = make([]int, height)
+	}
+	return ret
+}

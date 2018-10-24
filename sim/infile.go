@@ -48,11 +48,7 @@ func FrameFromFile(infile string) (*Frame, int32) {
 		frame.deposited = append(frame.deposited, 0)
 	}
 
-	frame.halite = make([][]int, width)
-
-	for x := 0; x < width; x++ {
-		frame.halite[x] = make([]int, height)
-	}
+	frame.halite = make_2d_int_array(width, height)
 
 	for x := 0; x < width; x++ {
 		for y := 0; y < height; y++ {

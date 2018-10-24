@@ -13,11 +13,7 @@ func MapGen(players, width, height, energy int, seed int32) *Frame {
 		frame.deposited = append(frame.deposited, 0)
 	}
 
-	frame.halite = make([][]int, width)
-
-	for x := 0; x < width; x++ {
-		frame.halite[x] = make([]int, height)
-	}
+	frame.halite = make_2d_int_array(width, height)
 
 	noise := make_2d_float_array(width, height)
 
@@ -109,11 +105,3 @@ func MapGen(players, width, height, energy int, seed int32) *Frame {
 	return frame
 }
 
-
-func make_2d_float_array(width, height int) [][]float64 {
-	ret := make([][]float64, width)
-	for x := 0; x < width; x++ {
-		ret[x] = make([]float64, height)
-	}
-	return ret
-}

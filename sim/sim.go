@@ -46,9 +46,9 @@ func (self *Frame) Copy() *Frame {
 
 	width, height := self.Width(), self.Height()
 
-	new_frame.halite = make([][]int, width)
+	new_frame.halite = make_2d_int_array(width, height)
+
 	for x := 0; x < width; x++ {
-		new_frame.halite[x] = make([]int, height)
 		for y := 0; y < height; y++ {
 			new_frame.halite[x][y] = self.halite[x][y]
 		}
