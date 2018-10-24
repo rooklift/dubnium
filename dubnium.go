@@ -281,6 +281,8 @@ func main() {
 	_, rf := game.UpdateFromMoves(move_strings)
 	replay.FullFrames = append(replay.FullFrames, rf)
 
+	// Now the game is finished, we just need to do some stats and printing...
+
 	replay.Stats = new(sim.ReplayStats)
 	replay.Stats.NumTurns = turns + 1
 
@@ -430,6 +432,18 @@ func parse_args() (width, height int, seed int32, no_timeout bool, no_replay boo
 			dealt_with[n] = true
 			no_replay = true
 			continue
+		}
+	}
+
+	for n, arg := range os.Args {
+
+		if dealt_with[n] {
+			continue
+		}
+
+		if len(arg) > 0 && arg[0] == '-' {
+			fmt.Fprintf(os.Stderr, "Couldn't understand flag %v (not implemented)\n", arg)
+			os.Exit(1)
 		}
 	}
 
