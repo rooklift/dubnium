@@ -23,7 +23,7 @@ func MapGenOfficial(players, width, height, player_energy int, seed int32) *Fram
 
 	// ----------------------------------------------------------------------------------------------------
 
-	tile_width := width / 2		// FIXME: consider odd-sized maps
+	tile_width := width / 2
 	tile_height := height / 2
 
 	if width % 2 == 1 { tile_width += 1 }
