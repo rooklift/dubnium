@@ -11,11 +11,11 @@ type StuffWeWant struct {
 	Constants				*Constants			`json:"GAME_CONSTANTS"`			// Solely used to get initial energy (5000)
 	Players					[]*ReplayPlayer		`json:"players"`
 	ProductionMap			*ReplayMap			`json:"production_map"`
-	Seed					int64				`json:"map_generator_seed"`
+	Seed					int32				`json:"map_generator_seed"`
 }
 
 
-func FrameFromFile(infile string) (*Frame, int64) {
+func FrameFromFile(infile string) (*Frame, int32) {
 
 	f, err := os.Open(infile)
 	if err != nil {

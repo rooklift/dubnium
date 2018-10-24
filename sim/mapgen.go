@@ -4,7 +4,7 @@ import (
 	"math"
 )
 
-func MapGen(players, width, height, energy int, seed int64) *Frame {
+func MapGen(players, width, height, energy int, seed int32) *Frame {
 
 	frame := new(Frame)
 
@@ -21,9 +21,9 @@ func MapGen(players, width, height, energy int, seed int64) *Frame {
 
 	noise := make_2d_float_array(width, height)
 
-	p := NewPerlin(2, 2, 20, seed)
-	q := NewPerlin(2, 2, 10, seed)
-	r := NewPerlin(2, 2, 3, seed)
+	p := NewPerlin(2, 2, 20, int64(seed))
+	q := NewPerlin(2, 2, 10, int64(seed))
+	r := NewPerlin(2, 2, 3, int64(seed))
 
 	lowest := 99999.0
 	highest := -99999.0
@@ -52,7 +52,7 @@ func MapGen(players, width, height, energy int, seed int64) *Frame {
 
 	const (
 		MAX_WANTED = 800.0
-		MIN_WANTED = -100.0
+		MIN_WANTED = -300.0
 	)
 
 	for x := 0; x < width; x++ {

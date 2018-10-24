@@ -32,10 +32,10 @@ type Constants struct {
 	SHIPS_ABOVE_FOR_CAPTURE		int
 	STRICT_ERRORS				bool
 
-	GameSeed					int64				`json:"game_seed"`		// Sent to bots but (in official) not to replay.
+	GameSeed					int32				`json:"game_seed"`		// Sent to bots but (in official) not to replay.
 }
 
-func NewConstants(players, width, height, turns int, seed int64) *Constants {
+func NewConstants(players, width, height, turns int, seed int32) *Constants {
 
 	return &Constants{
 

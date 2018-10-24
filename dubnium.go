@@ -313,14 +313,15 @@ func main() {
 
 // -----------------------------------------------------------------------------------------
 
-func parse_args() (int, int, int64, []string, string) {
+func parse_args() (int, int, int32, []string, string) {
 
 	var botlist []string
 	infile := ""
 
 	width := 0
 	height := 0
-	seed := time.Now().UTC().UnixNano()
+
+	seed := int32(time.Now().UTC().Unix())
 
 	dealt_with := make([]bool, len(os.Args))
 	dealt_with[0] = true
@@ -348,7 +349,8 @@ func parse_args() (int, int, int64, []string, string) {
 		if arg == "--seed" || arg == "-s" {
 			dealt_with[n] = true
 			dealt_with[n + 1] = true
-			seed, _ = strconv.ParseInt(os.Args[n + 1], 10, 64)
+			seed64, _ := strconv.ParseInt(os.Args[n + 1], 10, 32)
+			seed = int32(seed64)
 			continue
 		}
 
@@ -369,7 +371,7 @@ func parse_args() (int, int, int64, []string, string) {
 		botlist = append(botlist, arg)
 	}
 
-	rand.Seed(seed)		// Use the seed to get width/height, if needed...
+	rand.Seed(int64(seed))		// Use the seed to get width/height, if needed...
 
 	if width == 0 && height > 0 { width = height }
 	if height == 0 && width > 0 { height = width }
