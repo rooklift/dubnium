@@ -25,31 +25,26 @@ var bot_output_chan = make(chan BotOutput)		// Shared by all bot handlers.
 
 func bot_handler(cmd string, pid int, io chan string, pregame string) {
 
+	// There are 2 clear places where this handler can hang: the 2 Scan() calls.
+	// Therefore it is essential that main() never try to send to the io channel
+	// unless it knows that those scans succeeded.
+
 	bot_is_kill := false
 
 	cmd_split := strings.Fields(cmd)
 	exec_command := exec.Command(cmd_split[0], cmd_split[1:]...)
 
-	// Note that the command isn't run until we call .Start()
+	// Note that the command isn't run until we call Start().
 	// So the following is just setup for that and shouldn't fail.
 
-	i_pipe, err := exec_command.StdinPipe()
-	if err != nil {
-		fmt.Printf("%v\n", err)
-		os.Exit(1)
-	}
-
-	o_pipe, err := exec_command.StdoutPipe()
-	if err != nil {
-		fmt.Printf("%v\n", err)
-		os.Exit(1)
-	}
+	i_pipe, _ := exec_command.StdinPipe()
+	o_pipe, _ := exec_command.StdoutPipe()
 
 	// No need to have a stderr pipe; without one it will go to /dev/null
 
-	err = exec_command.Start()
+	err := exec_command.Start()
 	if err != nil {
-		fmt.Printf("Failed to start bot %d (%s)\n", pid, cmd)
+		fmt.Fprintf(os.Stderr, "Failed to start bot %d (%s)\n", pid, cmd)
 		bot_is_kill = true
 	}
 
@@ -60,18 +55,21 @@ func bot_handler(cmd string, pid int, io chan string, pregame string) {
 		}
 	}
 
-	scanner := bufio.NewScanner(o_pipe)		// Is this OK if the exec failed? Probably.
-	if scanner.Scan() == false {
-		fmt.Printf("Bot %d output reached EOF\n", pid)
+	scanner := bufio.NewScanner(o_pipe)
+
+	if bot_is_kill == false && scanner.Scan() == false {				// So the Scan() happens if bot at least started.
+		fmt.Fprintf(os.Stderr, "Bot %d output reached EOF\n", pid)
 		bot_output_chan <- BotOutput{pid, "Non-starter (EOF)"}
 		bot_is_kill = true
+	} else if bot_is_kill {
+		bot_output_chan <- BotOutput{pid, "Non-starter (exec)"}
 	} else {
 		bot_output_chan <- BotOutput{pid, scanner.Text()}
 	}
 
 	for {
 
-		to_send := <- io					// Since this blocks, main() must never send via io unless it knows we made it to here.
+		to_send := <- io			// Since this blocks, main() must never send via io unless it knows our last Scan() worked.
 
 		if bot_is_kill == false {
 
@@ -81,7 +79,7 @@ func bot_handler(cmd string, pid int, io chan string, pregame string) {
 			}
 
 			if scanner.Scan() == false {
-				fmt.Printf("Bot %d output reached EOF\n", pid)
+				fmt.Fprintf(os.Stderr, "Bot %d output reached EOF\n", pid)
 				bot_is_kill = true
 			}
 
@@ -99,7 +97,7 @@ func bot_handler(cmd string, pid int, io chan string, pregame string) {
 
 func main() {
 
-	width, height, seed, botlist, infile := parse_args()
+	width, height, seed, no_timeout, botlist, infile := parse_args()
 
 	var provided_frame *sim.Frame
 
@@ -114,12 +112,12 @@ func main() {
 	players := len(botlist)
 
 	if provided_frame != nil && provided_frame.Players() != players {
-		fmt.Printf("Wrong number of bots (%d) given for this replay (need %d)\n", players, provided_frame.Players())
+		fmt.Fprintf(os.Stderr, "Wrong number of bots (%d) given for this replay (need %d)\n", players, provided_frame.Players())
 		return
 	}
 
 	if players < 1 || players > 4 {
-		fmt.Printf("Bad number of players: %d\n", players)
+		fmt.Fprintf(os.Stderr, "Bad number of players: %d\n", players)
 		return
 	}
 
@@ -186,7 +184,11 @@ func main() {
 
 		case <- deadline.C:
 
-			fmt.Printf("Hit the deadline. Received: %d\n", names_received)
+			if no_timeout {
+				continue
+			}
+
+			fmt.Fprintf(os.Stderr, "Hit the deadline. Received: %d\n", names_received)
 
 			for pid := 0; pid < players; pid++ {
 				if player_names[pid] == "" {
@@ -257,6 +259,10 @@ func main() {
 
 				case <- deadline.C:
 
+					if no_timeout {
+						continue
+					}
+
 					for pid := 0; pid < players; pid++ {
 						if received[pid] == false {
 							move_strings[pid] = ""
@@ -313,15 +319,9 @@ func main() {
 
 // -----------------------------------------------------------------------------------------
 
-func parse_args() (int, int, int32, []string, string) {
+func parse_args() (width, height int, seed int32, no_timeout bool, botlist []string, infile string) {
 
-	var botlist []string
-	infile := ""
-
-	width := 0
-	height := 0
-
-	seed := int32(time.Now().UTC().Unix())
+	seed = int32(time.Now().UTC().Unix())
 
 	dealt_with := make([]bool, len(os.Args))
 	dealt_with[0] = true
@@ -360,6 +360,12 @@ func parse_args() (int, int, int32, []string, string) {
 			infile = os.Args[n + 1]
 			continue
 		}
+
+		if arg == "--no-timeout" {
+			dealt_with[n] = true
+			no_timeout = true
+			continue
+		}
 	}
 
 	for n, arg := range os.Args {
@@ -381,7 +387,7 @@ func parse_args() (int, int, int32, []string, string) {
 		height = width
 	}
 
-	return width, height, seed, botlist, infile
+	return width, height, seed, no_timeout, botlist, infile
 }
 
 // -----------------------------------------------------------------------------------------
