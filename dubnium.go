@@ -139,7 +139,7 @@ func main() {
 	game := sim.NewGame(constants)
 
 	if provided_frame == nil {
-		game.UseFrame(sim.MapGen(players, width, height, constants.INITIAL_ENERGY, seed))
+		game.UseFrame(sim.MapGenOfficial(players, width, height, constants.INITIAL_ENERGY, seed))
 	} else {
 		game.UseFrame(provided_frame)
 	}
