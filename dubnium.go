@@ -97,7 +97,9 @@ func bot_handler(cmd string, pid int, io chan string, pregame string) {
 
 func main() {
 
-	width, height, seed, no_timeout, botlist, infile := parse_args()
+	start_time := time.Now()
+
+	width, height, seed, no_timeout, no_replay, botlist, infile := parse_args()
 
 	var provided_frame *sim.Frame
 
@@ -310,21 +312,66 @@ func main() {
 		}
 	}
 
-	if infile != "" {
-		replay.Dump(fmt.Sprintf("reload-%v-%v-%v.hlt", seed, width, height))
-	} else {
-		replay.Dump(fmt.Sprintf("replay-%v-%v-%v.hlt", seed, width, height))
+	replay_filename := ""
+
+	if no_replay == false {
+		if infile != "" {
+			replay_filename = fmt.Sprintf("reload-%v-%v-%v.hlt", seed, width, height)
+		} else {
+			replay_filename = fmt.Sprintf("replay-%v-%v-%v.hlt", seed, width, height)
+		}
+		replay.Dump(replay_filename)
 	}
+
+	type RankScore struct {
+		Rank			int					`json:"rank"`
+		Score			int					`json:"score"`
+	}
+
+	type PrintedStats struct {
+		MapWidth		int					`json:"map_width"`
+		MapHeight		int					`json:"map_height"`
+		Replay			string				`json:"replay"`
+		Stats			map[int]RankScore	`json:"stats"`
+		MapSeed			int32				`json:"map_seed"`
+		Time			string				`json:"time"`
+	}
+
+	ps := new(PrintedStats)
+
+	ps.MapWidth = width
+	ps.MapHeight = height
+	ps.Replay = replay_filename
+	ps.MapSeed = seed
+	ps.Stats = make(map[int]RankScore)
+	ps.Time = time.Now().Sub(start_time).Round(time.Millisecond).String()
+
+	for pid := 0; pid < players; pid++ {
+
+		rankscore := RankScore{
+			Rank: replay.Stats.Pstats[pid].Rank,
+			Score: replay.Stats.Pstats[pid].FinalProduction,
+		}
+
+		ps.Stats[pid] = rankscore
+	}
+
+	foo, _ := json.MarshalIndent(ps, "", "    ")
+
+	fmt.Printf(string(foo))
+	fmt.Printf("\n")
 }
 
 // -----------------------------------------------------------------------------------------
 
-func parse_args() (width, height int, seed int32, no_timeout bool, botlist []string, infile string) {
+func parse_args() (width, height int, seed int32, no_timeout bool, no_replay bool, botlist []string, infile string) {
 
 	seed = int32(time.Now().UTC().Unix())
 
 	dealt_with := make([]bool, len(os.Args))
 	dealt_with[0] = true
+
+	var err error
 
 	for n, arg := range os.Args {
 
@@ -335,21 +382,33 @@ func parse_args() (width, height int, seed int32, no_timeout bool, botlist []str
 		if arg == "--width" || arg == "-w" {
 			dealt_with[n] = true
 			dealt_with[n + 1] = true
-			width, _ = strconv.Atoi(os.Args[n + 1])
+			width, err = strconv.Atoi(os.Args[n + 1])
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Couldn't understand stated width.\n")
+				os.Exit(1)
+			}
 			continue
 		}
 
 		if arg == "--height" || arg == "-h" {
 			dealt_with[n] = true
 			dealt_with[n + 1] = true
-			height, _ = strconv.Atoi(os.Args[n + 1])
+			height, err = strconv.Atoi(os.Args[n + 1])
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Couldn't understand stated height.\n")
+				os.Exit(1)
+			}
 			continue
 		}
 
 		if arg == "--seed" || arg == "-s" {
 			dealt_with[n] = true
 			dealt_with[n + 1] = true
-			seed64, _ := strconv.ParseInt(os.Args[n + 1], 10, 32)
+			seed64, err := strconv.ParseInt(os.Args[n + 1], 10, 32)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Couldn't understand stated seed.\n")
+				os.Exit(1)
+			}
 			seed = int32(seed64)
 			continue
 		}
@@ -364,6 +423,12 @@ func parse_args() (width, height int, seed int32, no_timeout bool, botlist []str
 		if arg == "--no-timeout" {
 			dealt_with[n] = true
 			no_timeout = true
+			continue
+		}
+
+		if arg == "--no-replay" {
+			dealt_with[n] = true
+			no_replay = true
 			continue
 		}
 	}
@@ -387,7 +452,7 @@ func parse_args() (width, height int, seed int32, no_timeout bool, botlist []str
 		height = width
 	}
 
-	return width, height, seed, no_timeout, botlist, infile
+	return width, height, seed, no_timeout, no_replay, botlist, infile
 }
 
 // -----------------------------------------------------------------------------------------
