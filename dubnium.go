@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -99,7 +100,7 @@ func main() {
 
 	start_time := time.Now()
 
-	width, height, seed, no_timeout, no_replay, botlist, infile := parse_args()
+	width, height, seed, no_timeout, no_replay, folder, botlist, infile := parse_args()
 
 	var provided_frame *sim.Frame
 
@@ -327,6 +328,7 @@ func main() {
 		} else {
 			replay_filename = fmt.Sprintf("replay-%v-%v-%v.hlt", seed, width, height)
 		}
+		replay_filename = filepath.Join(folder, replay_filename)
 		replay.Dump(replay_filename)
 	}
 
@@ -371,9 +373,10 @@ func main() {
 
 // -----------------------------------------------------------------------------------------
 
-func parse_args() (width, height int, seed int32, no_timeout bool, no_replay bool, botlist []string, infile string) {
+func parse_args() (width, height int, seed int32, no_timeout bool, no_replay bool, folder string, botlist []string, infile string) {
 
 	seed = int32(time.Now().UTC().Unix())
+	folder = "./"
 
 	dealt_with := make([]bool, len(os.Args))
 	dealt_with[0] = true
@@ -427,6 +430,13 @@ func parse_args() (width, height int, seed int32, no_timeout bool, no_replay boo
 			continue
 		}
 
+		if arg == "--replay-directory" || arg == "-i" {
+			dealt_with[n] = true
+			dealt_with[n + 1] = true
+			folder = os.Args[n + 1]
+			continue
+		}
+
 		if arg == "--no-timeout" {
 			dealt_with[n] = true
 			no_timeout = true
@@ -466,12 +476,12 @@ func parse_args() (width, height int, seed int32, no_timeout bool, no_replay boo
 	if width == 0 && height > 0 { width = height }
 	if height == 0 && width > 0 { height = width }
 
-	if width < 16 || width > 64 || height < 16 || height > 64 {
+	if width < 2 || width > 128 || height < 2 || height > 128 {
 		width = 32 + int(mt19937_32.Uint32() % 5) * 8
 		height = width
 	}
 
-	return width, height, seed, no_timeout, no_replay, botlist, infile
+	return width, height, seed, no_timeout, no_replay, folder, botlist, infile
 }
 
 // -----------------------------------------------------------------------------------------
