@@ -47,7 +47,7 @@ const (
 var mt []uint32 = make([]uint32, N)
 var mti int = N + 1
 
-func init_genrand(s uint32) {
+func Seed(s uint32) {
 
 	mt[0] = s & uint32(0xffffffff)
 
@@ -62,7 +62,7 @@ func init_by_array(init_key []uint32) {
 	key_length := len(init_key)
 
 	var i, j, k int
-	init_genrand(uint32(19650218))
+	Seed(uint32(19650218))
 	i = 1
 
 	if N > key_length {
@@ -97,6 +97,7 @@ func init_by_array(init_key []uint32) {
 	mt[0] = uint32(0x80000000)
 }
 
+/* generates a random number on [0,0xffffffff]-interval */
 func genrand_int32() uint32 {
 
 	var y uint32
@@ -107,7 +108,7 @@ func genrand_int32() uint32 {
 		var kk int
 
 		if mti == N + 1 {
-			init_genrand(uint32(5489))
+			Seed(uint32(5489))
 		}
 
 		for kk = 0; kk < N - M ; kk++ {
@@ -135,9 +136,19 @@ func genrand_int32() uint32 {
 	return y
 }
 
+/* generates a random number on [0,1]-real-interval */
+func genrand_real1() float64 {
+	return float64(genrand_int32()) * (1.0 / 4294967295.0)
+}
 
+/* generates a random number on [0,1)-real-interval */
+func genrand_real2() float64 {
+	return float64(genrand_int32()) * (1.0 / 4294967296.0)
+}
 
-/*
+func Float64() float64 {
+	 return genrand_real2()
+}
 
 func main() {
 
@@ -147,10 +158,17 @@ func main() {
 	fmt.Printf("1000 outputs of genrand_int32()\n");
 	for i := 0; i < 1000; i++ {
 		fmt.Printf("%10v ", genrand_int32())
-	  	if (i % 5 == 4) {
-	  		fmt.Printf("\n")
-	  	}
+		if (i % 5 == 4) {
+			fmt.Printf("\n")
+		}
+	}
+
+	fmt.Printf("\n1000 outputs of genrand_real2()\n")
+	for i := 0; i < 1000; i++ {
+		fmt.Printf("%.8f ", genrand_real2());
+		if (i % 5 == 4) {
+			fmt.Printf("\n")
+		}
 	}
 }
 
-*/

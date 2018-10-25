@@ -1,5 +1,7 @@
 package sim
 
+import "./mt19937_32"
+
 /*
 	This file is under the MIT License.
 
@@ -26,7 +28,6 @@ package sim
 
 import (
 	"math"
-	"math/rand"
 )
 
 func MapGenOfficial(players, width, height, player_energy int, seed int32) *Frame {
@@ -34,7 +35,7 @@ func MapGenOfficial(players, width, height, player_energy int, seed int32) *Fram
 	// AFAIK, perfectly faithful reproduction of the official mapgen in file:
 	// game_engine/mapgen/FractalValueNoiseTileGenerator.cpp
 
-	rand.Seed(int64(seed))
+	mt19937_32.Seed(uint32(seed))
 
 	frame := new(Frame)
 
@@ -130,7 +131,7 @@ func make_tile(tile_width, tile_height, max_production int) [][]int {
 
 	for y := 0; y < tile_height; y++ {
 		for x := 0; x < tile_width; x++ {
-			source_noise[y][x] = math.Pow(rand.Float64(), FACTOR_EXP_1)
+			source_noise[y][x] = math.Pow(mt19937_32.Float64(), FACTOR_EXP_1)
 		}
 	}
 
