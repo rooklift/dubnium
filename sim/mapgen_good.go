@@ -189,7 +189,7 @@ func make_tile(tile_width, tile_height int) [][]int {
 	for y := 0; y < tile_height; y++ {
 		for x := 0; x < tile_width; x++ {
 			region[y][x] *= float64(actual_max) / max_value
-			tile[x][y] = int(region[y][x])								// Note the [x][y] and [y][x]
+			tile[x][y] = int(math.Round(region[y][x]))						// Note the [x][y] and [y][x]
 		}
 	}
 
