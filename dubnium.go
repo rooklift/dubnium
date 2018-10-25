@@ -448,6 +448,16 @@ func parse_args() (width, height int, seed int32, no_timeout bool, no_replay boo
 			no_replay = true
 			continue
 		}
+
+		if arg == "--no-compression" {		// We already don't...
+			dealt_with[n] = true
+			continue
+		}
+
+		if arg == "--results-as-json" {		// We always do...
+			dealt_with[n] = true
+			continue
+		}
 	}
 
 	for n, arg := range os.Args {
