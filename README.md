@@ -2,7 +2,7 @@
 
 Basically-working alternate *engine* (not bot) for [Halite 3](https://github.com/HaliteChallenge/Halite-III).
 
-Dubnium has its own mapgen. The seeds are within a hair of being compatible with Official, but the generated maps tend to have slight differences in halite values (i.e. the value might be out by 1).
+Dubnium has its own mapgen. The seeds should be compatible with Official (please report any discrepancies you see).
 
 If you want to you can also load the map from a (decompressed, plain-JSON) replay:
 
