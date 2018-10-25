@@ -71,7 +71,7 @@ func MapGenOfficial(players, width, height, player_energy int, seed int32) *Fram
 		}
 	}
 
-	place_factories(frame, players)
+	place_factories(frame, players, tile_width, tile_height)
 
 	return frame
 }
@@ -176,20 +176,32 @@ func make_tile(tile_width, tile_height, max_production int) [][]int {
 		}
 	}
 
+	// The function now makes 2 RNG calls which end up not being used,
+	// because the factory location generated is ignored. We duplicate
+	// the calls here to keep the RNG consistent...
+
+	mt19937_32.Uint32()
+	mt19937_32.Uint32()
+
 	return tile
 }
 
-func place_factories(frame *Frame, players int) {
+func place_factories(frame *Frame, players, tile_width, tile_height int) {
 
 	width := frame.Width()
 	height := frame.Height()
 
 	frame.dropoffs = nil
 
-	// FIXME
+	dx := width / 2
+	dy := height / 2
 
-	dx := int(mt19937_32.Uint32()) % width
-	dy := dx								// int(mt19937_32.Uint32()) % height
+	if tile_width >= 16 && tile_width <= 40 && tile_height >= 16 && tile_height <= 40 {
+		dx = int(8.0 + (float64(tile_width - 16) / 24.0) * 20.0)
+		if players > 2 {
+			dy = int(8.0 + (float64(tile_height - 16) / 24.0) * 20.0)
+		}
+	}
 
 	for pid := 0; pid < players; pid++ {
 
