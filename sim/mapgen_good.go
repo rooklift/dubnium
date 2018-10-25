@@ -129,6 +129,8 @@ func make_tile(tile_width, tile_height, max_production int) [][]int {
 		FACTOR_EXP_1 = 2
 		FACTOR_EXP_2 = 2
 		PERSISTENCE = 0.7
+		MAX_CELL_PRODUCTION = 1000
+		MIN_CELL_PRODUCTION = 900
 	)
 
 	for y := 0; y < tile_height; y++ {
@@ -166,11 +168,11 @@ func make_tile(tile_width, tile_height, max_production int) [][]int {
 
 	// Normalize to highest value.
 
-	MAX_CELL_PRODUCTION := max_production
+	actual_max := mt19937_32.Uint32() % (1 + MAX_CELL_PRODUCTION - MIN_CELL_PRODUCTION) + MIN_CELL_PRODUCTION
 
 	for y := 0; y < tile_height; y++ {
 		for x := 0; x < tile_width; x++ {
-			region[y][x] *= float64(MAX_CELL_PRODUCTION) / max_value
+			region[y][x] *= float64(actual_max) / max_value
 			tile[x][y] = int(region[y][x])								// Note the [x][y] and [y][x]
 		}
 	}
@@ -185,23 +187,28 @@ func place_factories(frame *Frame, players int) {
 
 	frame.dropoffs = nil
 
+	// FIXME
+
+	dx := int(mt19937_32.Uint32()) % width
+	dy := dx								// int(mt19937_32.Uint32()) % height
+
 	for pid := 0; pid < players; pid++ {
 
 		var x int
 		var y int
 
 		if pid == 0 {
-			x = width / 4
-			y = height / 4
+			x = dx
+			y = dy
 		} else if pid == 1 {
-			x = width - 1 - width / 4
-			y = height / 4
+			x = width - 1 - dx
+			y = dy
 		} else if pid == 2 {
-			x = width / 4
-			y = height - 1 - height / 4
+			x = dx
+			y = height - 1 - dy
 		} else {
-			x = width - 1 - width / 4
-			y = height - 1 - height / 4
+			x = width - 1 - dx
+			y = height - 1 - dy
 		}
 
 		factory := &Dropoff{
