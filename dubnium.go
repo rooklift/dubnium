@@ -323,10 +323,13 @@ func main() {
 	replay_filename := ""
 
 	if no_replay == false {
+
+		timestamp := time.Now().Format("20060102-150405-0700")
+
 		if infile != "" {
-			replay_filename = fmt.Sprintf("reload-%v-%v-%v.hlt", seed, width, height)
+			replay_filename = fmt.Sprintf("reload-%v-%v-%v-%v.hlt", timestamp, seed, width, height)
 		} else {
-			replay_filename = fmt.Sprintf("replay-%v-%v-%v.hlt", seed, width, height)
+			replay_filename = fmt.Sprintf("replay-%v-%v-%v-%v.hlt", timestamp, seed, width, height)
 		}
 		replay_filename = filepath.Join(folder, replay_filename)
 		replay.Dump(replay_filename)
