@@ -136,6 +136,10 @@ func genrand_int32() uint32 {
 	return y
 }
 
+func Uint32() uint32 {
+	return genrand_int32()
+}
+
 /* generates a random number on [0,1]-real-interval */
 func genrand_real1() float64 {
 	return float64(genrand_int32()) * (1.0 / 4294967295.0)
