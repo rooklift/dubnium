@@ -1,7 +1,5 @@
 package sim
 
-import "./mt19937_32"
-
 /*
 	This file is under the MIT License.
 
@@ -28,6 +26,7 @@ import "./mt19937_32"
 
 import (
 	"math"
+	"./mt19937_32"
 )
 
 func MapGenOfficial(players, width, height, player_energy int, seed int32) *Frame {
