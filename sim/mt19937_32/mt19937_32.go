@@ -34,10 +34,6 @@ package mt19937_32
 	OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-import (
-	"fmt"
-)
-
 const (
 	N = 624
 	M = 397
@@ -67,6 +63,11 @@ func Seed(s uint32) {
 		mt[mti] = (uint32(1812433253) * (mt[mti - 1] ^ (mt[mti - 1] >> 30)) + uint32(mti))
 		mt[mti] &= uint32(0xffffffff)	// Can likely comment this out, looks like a no-op in Go.
 	}
+}
+
+func Urd() float64 {		// Mimic the behaviour of uniform_real_distribution in the C++ library I'm dealing with.
+	genrand_int32()			// Discard the first call to the RNG. (Why does this work???)
+	return Float64()
 }
 
 // --------------------------------------------------------------------------------------

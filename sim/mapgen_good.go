@@ -135,8 +135,7 @@ func make_tile(tile_width, tile_height, max_production int) [][]int {
 
 	for y := 0; y < tile_height; y++ {
 		for x := 0; x < tile_width; x++ {
-			mt19937_32.Float64()	// LOL
-			source_noise[y][x] = math.Pow(mt19937_32.Float64(), FACTOR_EXP_1)
+			source_noise[y][x] = math.Pow(mt19937_32.Urd(), FACTOR_EXP_1)
 		}
 	}
 
