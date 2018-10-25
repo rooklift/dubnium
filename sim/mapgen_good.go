@@ -1,7 +1,6 @@
 package sim
 
-/*
-	This file is under the MIT License.
+/*	This file is under the MIT License.
 
 	Copyright (c) 2016 Michael Truell and Benjamin Spector
 
@@ -29,12 +28,11 @@ import (
 	"./mt19937_32"
 )
 
+// AFAIK, perfectly faithful reproduction of the official mapgen in files:
+// game_engine/mapgen/FractalValueNoiseTileGenerator.cpp
+// game_engine/mapgen/SymmetricalTile.cpp
+
 func MapGenOfficial(players, width, height, player_energy int, seed int32) *Frame {
-
-	// AFAIK, perfectly faithful reproduction of the official mapgen in file:
-	// game_engine/mapgen/FractalValueNoiseTileGenerator.cpp
-
-	// For the RNG, probably I need to reproduce std::uniform_real_distribution
 
 	mt19937_32.Seed(uint32(seed))
 
