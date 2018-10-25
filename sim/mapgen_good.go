@@ -35,6 +35,8 @@ func MapGenOfficial(players, width, height, player_energy int, seed int32) *Fram
 	// AFAIK, perfectly faithful reproduction of the official mapgen in file:
 	// game_engine/mapgen/FractalValueNoiseTileGenerator.cpp
 
+	// For the RNG, probably I need to reproduce std::uniform_real_distribution
+
 	mt19937_32.Seed(uint32(seed))
 
 	frame := new(Frame)

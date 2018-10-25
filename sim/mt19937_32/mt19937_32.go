@@ -36,10 +36,6 @@ package mt19937_32
 
 import "fmt"
 
-// Compare:
-// https://en.cppreference.com/w/cpp/numeric/random/mersenne_twister_engine
-// What is r in the call there?
-
 const (
 	N = 624
 	M = 397
