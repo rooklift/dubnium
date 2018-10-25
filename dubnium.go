@@ -458,6 +458,11 @@ func parse_args() (width, height int, seed int32, no_timeout bool, no_replay boo
 			dealt_with[n] = true
 			continue
 		}
+
+		if arg == "--no-logs" {				// We already don't...
+			dealt_with[n] = true
+			continue
+		}
 	}
 
 	for n, arg := range os.Args {
