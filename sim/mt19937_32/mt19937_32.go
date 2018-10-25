@@ -36,6 +36,10 @@ package mt19937_32
 
 import "fmt"
 
+// Compare:
+// https://en.cppreference.com/w/cpp/numeric/random/mersenne_twister_engine
+// What is r in the call there?
+
 const (
 	N = 624
 	M = 397
@@ -165,11 +169,13 @@ func Float64() float64 {
 
 func main() {
 
-	var init []uint32 = []uint32{0x123, 0x234, 0x345, 0x456}
-	init_by_array(init)
+	// var init []uint32 = []uint32{0x123, 0x234, 0x345, 0x456}
+	// init_by_array(init)
 
-	fmt.Printf("1000 outputs of genrand_int32()\n");
-	for i := 0; i < 1000; i++ {
+	// With no seed, 4123659995 should show up at 10000
+
+	fmt.Printf("10000 outputs of genrand_int32()\n");
+	for i := 0; i < 10000; i++ {
 		fmt.Printf("%10v ", genrand_int32())
 		if (i % 5 == 4) {
 			fmt.Printf("\n")
