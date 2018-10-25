@@ -49,58 +49,29 @@ const (
 var mt []uint32 = make([]uint32, N)
 var mti int = N + 1
 
+// --------------------------------------------------------------------------------------
+
+func Float64() float64 {
+	 return genrand_real2()
+}
+
+func Uint32() uint32 {
+	return genrand_int32()
+}
+
 func Seed(s uint32) {
 
 	mt[0] = s & uint32(0xffffffff)
 
 	for mti = 1; mti < N; mti++ {
 		mt[mti] = (uint32(1812433253) * (mt[mti - 1] ^ (mt[mti - 1] >> 30)) + uint32(mti))
-		mt[mti] &= uint32(0xffffffff)	// Can likely comment this out
+		mt[mti] &= uint32(0xffffffff)	// Can likely comment this out, looks like a no-op in Go.
 	}
 }
 
-func init_by_array(init_key []uint32) {
+// --------------------------------------------------------------------------------------
 
-	key_length := len(init_key)
-
-	var i, j, k int
-	Seed(uint32(19650218))
-	i = 1
-
-	if N > key_length {
-		k = N
-	} else {
-		k = key_length
-	}
-
-	for ; k != 0; k-- {
-		mt[i] = (mt[i] ^ ((mt[i-1] ^ (mt[i-1] >> 30)) * uint32(1664525))) + init_key[j] + uint32(j)
-		mt[i] &= uint32(0xffffffff)		// Can likely comment this out
-		i++
-		j++
-		if i >= N {
-			mt[0] = mt[N - 1]
-			i = 1
-		}
-		if j >= key_length {
-			j = 0
-		}
-	}
-	for k = N - 1; k != 0; k-- {
-		mt[i] = (mt[i] ^ ((mt[i - 1] ^ (mt[i - 1] >> 30)) * uint32(1566083941))) - uint32(i)
-		mt[i] &= uint32(0xffffffff) 	// Can likely comment this out
-		i++
-		if i >= N {
-			mt[0] = mt[N - 1]
-			i = 1
-		}
-	}
-
-	mt[0] = uint32(0x80000000)
-}
-
-/* generates a random number on [0,0xffffffff]-interval */
-func genrand_int32() uint32 {
+func genrand_int32() uint32 {									// [0,0xffffffff]
 
 	var y uint32
 	var mag01 [2]uint32 = [2]uint32{0, MATRIX_A}
@@ -138,54 +109,10 @@ func genrand_int32() uint32 {
 	return y
 }
 
-func Uint32() uint32 {
-	return genrand_int32()
-}
-
-/* generates a random number on [0,1]-real-interval */
-func genrand_real1() float64 {
+func genrand_real1() float64 {									// [0,1]
 	return float64(genrand_int32()) * (1.0 / 4294967295.0)
 }
 
-/* generates a random number on [0,1)-real-interval */
-func genrand_real2() float64 {
+func genrand_real2() float64 {									// [0,1)
 	return float64(genrand_int32()) * (1.0 / 4294967296.0)
 }
-
-/* generates a random number on [0,1) with 53-bit resolution */
-func genrand_res53() float64 {
-
-	var a uint32 = genrand_int32() >> 5
-	var b uint32 = genrand_int32() >> 6
-
-    return (float64(a) * 67108864.0 + float64(b)) * (1.0 / 9007199254740992.0)
-}
-
-func Float64() float64 {
-	 return genrand_real2()
-}
-
-func main() {
-
-	// var init []uint32 = []uint32{0x123, 0x234, 0x345, 0x456}
-	// init_by_array(init)
-
-	// With no seed, 4123659995 should show up at 10000
-
-	fmt.Printf("10000 outputs of genrand_int32()\n");
-	for i := 0; i < 10000; i++ {
-		fmt.Printf("%10v ", genrand_int32())
-		if (i % 5 == 4) {
-			fmt.Printf("\n")
-		}
-	}
-
-	fmt.Printf("\n1000 outputs of genrand_real2()\n")
-	for i := 0; i < 1000; i++ {
-		fmt.Printf("%.8f ", genrand_real2());
-		if (i % 5 == 4) {
-			fmt.Printf("\n")
-		}
-	}
-}
-
