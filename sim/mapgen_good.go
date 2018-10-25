@@ -50,13 +50,26 @@ func MapGenOfficial(players, width, height, player_energy int, seed int32) *Fram
 
 	// ----------------------------------------------------------------------------------------------------
 
-	tile_width := width / 2
-	tile_height := height / 2
+	tile_width := width
+	tile_height := height
 
-	if width % 2 == 1 { tile_width += 1 }
-	if height % 2 == 1 { tile_height += 1 }
+	tile_cols := 1
+	tile_rows := 1
 
-	tile := make_tile(tile_width, tile_height, 950)
+	if players > 1 {
+		tile_width = width / 2
+		tile_cols = 2
+	}
+
+	if players > 2 {
+		tile_height = height / 2
+		tile_rows = 2
+	}
+
+	if width % 2 == 1 && tile_cols >= 2 { tile_width += 1 }
+	if height % 2 == 1 && tile_rows >= 2 { tile_height += 1 }
+
+	tile := make_tile(tile_width, tile_height)
 
 	for x := 0; x < tile_width; x++ {
 
@@ -65,9 +78,13 @@ func MapGenOfficial(players, width, height, player_energy int, seed int32) *Fram
 			val := tile[x][y]
 
 			frame.halite[x][y] = val
-			frame.halite[width - 1 - x][y] = val
-			frame.halite[x][height - 1 - y] = val
-			frame.halite[width - 1 - x][height - 1 - y] = val
+
+			if tile_cols > 1 { frame.halite[width - 1 - x][y] = val }
+
+			if tile_rows > 1 {
+				frame.halite[x][height - 1 - y] = val
+				frame.halite[width - 1 - x][height - 1 - y] = val
+			}
 		}
 	}
 
@@ -116,7 +133,7 @@ func generate_smooth_noise(source_noise [][]float64, wavelength int) [][]float64
 	return smoothed_source
 }
 
-func make_tile(tile_width, tile_height, max_production int) [][]int {
+func make_tile(tile_width, tile_height int) [][]int {
 
 	// Although various things here use [y][x] format, the tile itself is in our normal [x][y]...
 
@@ -193,8 +210,8 @@ func place_factories(frame *Frame, players, tile_width, tile_height int) {
 
 	frame.dropoffs = nil
 
-	dx := width / 2
-	dy := height / 2
+	dx := tile_width / 2
+	dy := tile_height / 2
 
 	if tile_width >= 16 && tile_width <= 40 && tile_height >= 16 && tile_height <= 40 {
 		dx = int(8.0 + (float64(tile_width - 16) / 24.0) * 20.0)
