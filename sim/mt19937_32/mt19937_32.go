@@ -34,7 +34,9 @@ package mt19937_32
 	OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-import "fmt"
+import (
+	"fmt"
+)
 
 const (
 	N = 624
@@ -53,7 +55,7 @@ func Seed(s uint32) {
 
 	for mti = 1; mti < N; mti++ {
 		mt[mti] = (uint32(1812433253) * (mt[mti - 1] ^ (mt[mti - 1] >> 30)) + uint32(mti))
-		mt[mti] &= uint32(0xffffffff)		// Can likely comment this out
+		mt[mti] &= uint32(0xffffffff)	// Can likely comment this out
 	}
 }
 
@@ -160,7 +162,7 @@ func genrand_res53() float64 {
 }
 
 func Float64() float64 {
-	 return genrand_res53()
+	 return genrand_real2()
 }
 
 func main() {
