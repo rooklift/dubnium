@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
-	"math/rand"
 	"os"
 	"os/exec"
 	"strconv"
@@ -12,6 +11,7 @@ import (
 	"time"
 
 	"./sim"
+	"./sim/mt19937_32"
 )
 
 type BotOutput struct {
@@ -461,13 +461,13 @@ func parse_args() (width, height int, seed int32, no_timeout bool, no_replay boo
 		botlist = append(botlist, arg)
 	}
 
-	rand.Seed(int64(seed))		// Use the seed to get width/height, if needed...
+	mt19937_32.Seed(uint32(seed))		// Use the seed to get width/height, if needed...
 
 	if width == 0 && height > 0 { width = height }
 	if height == 0 && width > 0 { height = width }
 
 	if width < 16 || width > 64 || height < 16 || height > 64 {
-		width = 32 + rand.Intn(5) * 8
+		width = 32 + int(mt19937_32.Uint32() % 5) * 8
 		height = width
 	}
 
