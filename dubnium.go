@@ -101,7 +101,7 @@ func main() {
 	start_time := time.Now()
 
 	// This stuff should be a struct I guess...
-	width, height, seed, no_timeout, no_replay, viewer, folder, infile, botlist := parse_args()
+	width, height, sleep, seed, no_timeout, no_replay, viewer, folder, infile, botlist := parse_args()
 
 	var provided_frame *sim.Frame
 
@@ -253,6 +253,8 @@ func main() {
 			}
 		}
 
+		wait_start_time := time.Now()
+
 		if received_total < players {
 
 			deadline := time.NewTimer(2 * time.Second)
@@ -292,6 +294,13 @@ func main() {
 					break Wait
 				}
 			}
+		}
+
+		elapsed := time.Now().Sub(wait_start_time)
+		wanted := time.Duration(sleep) * time.Millisecond
+
+		if elapsed < wanted {
+			time.Sleep(wanted - elapsed)
 		}
 	}
 
@@ -391,7 +400,7 @@ func main() {
 // -----------------------------------------------------------------------------------------
 
 func parse_args() (
-		width, height int,
+		width, height, sleep int,
 		seed int32,
 		no_timeout, no_replay, viewer bool,
 		folder, infile string,
@@ -436,12 +445,23 @@ func parse_args() (
 		if arg == "--seed" || arg == "-s" {
 			dealt_with[n] = true
 			dealt_with[n + 1] = true
-			seed64, err := strconv.ParseInt(os.Args[n + 1], 10, 32)
+			seed64, err := strconv.ParseInt(os.Args[n + 1], 10, 32)		// ParseInt only here (I forget why)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Couldn't understand stated seed.\n")
 				os.Exit(1)
 			}
 			seed = int32(seed64)
+			continue
+		}
+
+		if arg == "--sleep" {
+			dealt_with[n] = true
+			dealt_with[n + 1] = true
+			sleep, err = strconv.Atoi(os.Args[n + 1])
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Couldn't understand stated sleep.\n")
+				os.Exit(1)
+			}
 			continue
 		}
 
@@ -524,7 +544,7 @@ func parse_args() (
 		height = width
 	}
 
-	return width, height, seed, no_timeout, no_replay, viewer, folder, infile, botlist
+	return width, height, sleep, seed, no_timeout, no_replay, viewer, folder, infile, botlist
 }
 
 // -----------------------------------------------------------------------------------------
