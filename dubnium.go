@@ -100,7 +100,8 @@ func main() {
 
 	start_time := time.Now()
 
-	width, height, seed, no_timeout, no_replay, folder, botlist, infile := parse_args()
+	// This stuff should be a struct I guess...
+	width, height, seed, no_timeout, no_replay, viewer, folder, infile, botlist := parse_args()
 
 	var provided_frame *sim.Frame
 
@@ -156,9 +157,15 @@ func main() {
 
 	init_string := game.BotInitString()
 
+	var pregame string
+
 	for pid := 0; pid < players; pid++ {
-		pregame := fmt.Sprintf("%s\n%d %d\n%s", json_blob, players, pid, init_string)
+		pregame = fmt.Sprintf("%s\n%d %d\n%s", json_blob, players, pid, init_string)
 		go bot_handler(botlist[pid], pid, io_chans[pid], pregame)
+	}
+
+	if viewer {
+		print_with_newline(pregame)		// The viewer will get the POV of the final player
 	}
 
 	var player_names []string
@@ -226,6 +233,10 @@ func main() {
 					io_chans[pid] <- update_string		// THIS WILL HANG THE ENGINE IF THE HANDLER ISN'T AT THE RIGHT PLACE. Care!
 				}
 			}
+		}
+
+		if viewer {
+			print_with_newline(update_string)
 		}
 
 		received := make([]bool, players)
@@ -335,48 +346,56 @@ func main() {
 		replay.Dump(replay_filename)
 	}
 
-	type RankScore struct {
-		Rank			int					`json:"rank"`
-		Score			int					`json:"score"`
-	}
+	if viewer == false {
 
-	type PrintedStats struct {
-		MapWidth		int					`json:"map_width"`
-		MapHeight		int					`json:"map_height"`
-		Replay			string				`json:"replay"`
-		Stats			map[int]RankScore	`json:"stats"`
-		MapSeed			int32				`json:"map_seed"`
-		Time			string				`json:"time"`
-	}
-
-	ps := new(PrintedStats)
-
-	ps.MapWidth = width
-	ps.MapHeight = height
-	ps.Replay = replay_filename
-	ps.MapSeed = seed
-	ps.Stats = make(map[int]RankScore)
-	ps.Time = time.Now().Sub(start_time).Round(time.Millisecond).String()
-
-	for pid := 0; pid < players; pid++ {
-
-		rankscore := RankScore{
-			Rank: replay.Stats.Pstats[pid].Rank,
-			Score: replay.Stats.Pstats[pid].FinalProduction,
+		type RankScore struct {
+			Rank			int					`json:"rank"`
+			Score			int					`json:"score"`
 		}
 
-		ps.Stats[pid] = rankscore
+		type PrintedStats struct {
+			MapWidth		int					`json:"map_width"`
+			MapHeight		int					`json:"map_height"`
+			Replay			string				`json:"replay"`
+			Stats			map[int]RankScore	`json:"stats"`
+			MapSeed			int32				`json:"map_seed"`
+			Time			string				`json:"time"`
+		}
+
+		ps := new(PrintedStats)
+
+		ps.MapWidth = width
+		ps.MapHeight = height
+		ps.Replay = replay_filename
+		ps.MapSeed = seed
+		ps.Stats = make(map[int]RankScore)
+		ps.Time = time.Now().Sub(start_time).Round(time.Millisecond).String()
+
+		for pid := 0; pid < players; pid++ {
+
+			rankscore := RankScore{
+				Rank: replay.Stats.Pstats[pid].Rank,
+				Score: replay.Stats.Pstats[pid].FinalProduction,
+			}
+
+			ps.Stats[pid] = rankscore
+		}
+
+		foo, _ := json.MarshalIndent(ps, "", "    ")
+
+		fmt.Printf(string(foo))
+		fmt.Printf("\n")
 	}
-
-	foo, _ := json.MarshalIndent(ps, "", "    ")
-
-	fmt.Printf(string(foo))
-	fmt.Printf("\n")
 }
 
 // -----------------------------------------------------------------------------------------
 
-func parse_args() (width, height int, seed int32, no_timeout bool, no_replay bool, folder string, botlist []string, infile string) {
+func parse_args() (
+		width, height int,
+		seed int32,
+		no_timeout, no_replay, viewer bool,
+		folder, infile string,
+		botlist []string) {
 
 	seed = int32(time.Now().UTC().Unix())
 	folder = "./"
@@ -440,6 +459,12 @@ func parse_args() (width, height int, seed int32, no_timeout bool, no_replay boo
 			continue
 		}
 
+		if arg == "--viewer" || arg == "-u" {
+			dealt_with[n] = true
+			viewer = true
+			continue
+		}
+
 		if arg == "--no-timeout" {
 			dealt_with[n] = true
 			no_timeout = true
@@ -499,7 +524,7 @@ func parse_args() (width, height int, seed int32, no_timeout bool, no_replay boo
 		height = width
 	}
 
-	return width, height, seed, no_timeout, no_replay, folder, botlist, infile
+	return width, height, seed, no_timeout, no_replay, viewer, folder, infile, botlist
 }
 
 // -----------------------------------------------------------------------------------------
@@ -512,4 +537,11 @@ func turns_from_size(width, height int) int {
 	}
 
 	return (((size - 32) * 25) / 8) + 400
+}
+
+func print_with_newline(s string) {
+	fmt.Printf(s)
+	if len(s) > 0 && s[len(s) - 1] != '\n' {
+		fmt.Printf("\n")
+	}
 }
