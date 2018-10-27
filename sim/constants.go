@@ -46,8 +46,8 @@ func NewConstants(players, width, height, turns int, seed int32) *Constants {
 		DROPOFF_COST:				4000,
 		DROPOFF_PENALTY_RATIO:		4,			// What's this?
 		EXTRACT_RATIO:				4,
-		FACTOR_EXP_1:				2,			// What's this?
-		FACTOR_EXP_2:				2,			// What's this?
+		FACTOR_EXP_1:				2,
+		FACTOR_EXP_2:				2,
 		INITIAL_ENERGY:				5000,
 		INSPIRATION_ENABLED:		true,
 		INSPIRATION_RADIUS:			4,
@@ -65,7 +65,7 @@ func NewConstants(players, width, height, turns int, seed int32) *Constants {
 		MIN_TURN_THRESHOLD:			32,			// What's this?
 		MOVE_COST_RATIO:			10,
 		NEW_ENTITY_ENERGY_COST:		1000,
-		PERSISTENCE:				0.7,		// What's this?
+		PERSISTENCE:				0.7,
 		SHIPS_ABOVE_FOR_CAPTURE:	3,
 		STRICT_ERRORS:				false,
 
