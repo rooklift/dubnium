@@ -63,13 +63,13 @@ func (self *Game) UpdateFromMoves(all_player_moves []string) (string, *ReplayFra
 				command = token
 
 				if command != "g" && command != "m" && command != "c" {
-					fails[pid] = fmt.Sprintf("Got unknown command \"%s\"", command)
+					fails[pid] = fmt.Sprintf("Bot %v sent unknown command \"%s\"", pid, command)
 					break TokenLoop
 				}
 
 				if command == "g" {
 					if gens[pid] {
-						fails[pid] = "Got 2 or more generate commands"
+						fails[pid] = fmt.Sprintf("Bot %v sent 2 or more generate commands", pid)
 						break TokenLoop
 					}
 					gens[pid] = true
@@ -89,7 +89,7 @@ func (self *Game) UpdateFromMoves(all_player_moves []string) (string, *ReplayFra
 				}
 
 				if sid >= len(self.frame.ships) || sid < 0 || self.frame.ships[sid] == nil {
-					fails[pid] = fmt.Sprintf("Got command for non-existent ship %d", sid)
+					fails[pid] = fmt.Sprintf("Bot %v sent command for non-existent ship %d", pid, sid)
 					break TokenLoop
 				}
 
@@ -98,14 +98,14 @@ func (self *Game) UpdateFromMoves(all_player_moves []string) (string, *ReplayFra
 				ship := self.frame.ships[sid]
 
 				if ship.Owner != pid {
-					fails[pid] = fmt.Sprintf("Got command for ship %d owned by player %d", sid, ship.Owner)
+					fails[pid] = fmt.Sprintf("Bot %v sent command for ship %d owned by player %d", pid, sid, ship.Owner)
 					break TokenLoop
 				}
 
 				// So the ship is indeed owned by the player...
 
 				if moves[sid] != "" {
-					fails[pid] = fmt.Sprintf("Got 2 or more commands for ship %d", sid)
+					fails[pid] = fmt.Sprintf("Bot %v sent 2 or more commands for ship %d", pid, sid)
 					break TokenLoop
 				}
 
@@ -113,7 +113,7 @@ func (self *Game) UpdateFromMoves(all_player_moves []string) (string, *ReplayFra
 
 					for _, dropoff := range self.frame.dropoffs {
 						if dropoff.X == ship.X && dropoff.Y == ship.Y {
-							fails[pid] = fmt.Sprintf("Got construct command from ship %d over a structure", sid)
+							fails[pid] = fmt.Sprintf("Bot %v sent construct command from ship %d over a structure", pid, sid)
 							break TokenLoop
 						}
 					}
@@ -128,7 +128,7 @@ func (self *Game) UpdateFromMoves(all_player_moves []string) (string, *ReplayFra
 			direction := token
 
 			if direction != "n" && direction != "s" && direction != "e" && direction != "w" && direction != "o" {
-				fails[pid] = fmt.Sprintf("Got unknown direction \"%s\"", direction)
+				fails[pid] = fmt.Sprintf("Bot %v sent unknown direction \"%s\"", pid, direction)
 				break TokenLoop
 			}
 
@@ -178,7 +178,7 @@ func (self *Game) UpdateFromMoves(all_player_moves []string) (string, *ReplayFra
 
 	for pid := 0; pid < players; pid++ {
 		if new_frame.budgets[pid] < 0 {
-			fails[pid] = "Went over budget"
+			fails[pid] = fmt.Sprintf("Bot %v went over budget", pid)
 		}
 	}
 
