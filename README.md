@@ -1,4 +1,4 @@
-# 🐢 🐊 🦎 🐍
+# Dubnium 🐢
 
 Fully working alternate *engine* (not bot) for [Halite 3](https://github.com/HaliteChallenge/Halite-III). Build with `go build dubnium.go`
 
