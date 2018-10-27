@@ -34,15 +34,15 @@ package mt19937_32
 */
 
 const (
-	N = 624
-	M = 397
-	MATRIX_A = uint32(0x9908b0df)
-	UPPER_MASK = uint32(0x80000000)
-	LOWER_MASK = uint32(0x7fffffff)
+	_N = 624
+	_M = 397
+	_MATRIX_A = uint32(0x9908b0df)
+	_UPPER_MASK = uint32(0x80000000)
+	_LOWER_MASK = uint32(0x7fffffff)
 )
 
-var mt []uint32 = make([]uint32, N)
-var mti int = N + 1
+var mt []uint32 = make([]uint32, _N)
+var mti int = _N + 1
 
 // --------------------------------------------------------------------------------------
 
@@ -58,7 +58,7 @@ func Seed(s uint32) {
 
 	mt[0] = s & uint32(0xffffffff)
 
-	for mti = 1; mti < N; mti++ {
+	for mti = 1; mti < _N; mti++ {
 		mt[mti] = (uint32(1812433253) * (mt[mti - 1] ^ (mt[mti - 1] >> 30)) + uint32(mti))
 		mt[mti] &= uint32(0xffffffff)	// Can likely comment this out, looks like a no-op in Go.
 	}
@@ -74,26 +74,26 @@ func Urd() float64 {		// Mimic the behaviour of uniform_real_distribution in the
 func genrand_int32() uint32 {									// [0,0xffffffff]
 
 	var y uint32
-	var mag01 [2]uint32 = [2]uint32{0, MATRIX_A}
+	var mag01 [2]uint32 = [2]uint32{0, _MATRIX_A}
 
-	if mti >= N {
+	if mti >= _N {
 
 		var kk int
 
-		if mti == N + 1 {
+		if mti == _N + 1 {
 			Seed(uint32(5489))
 		}
 
-		for kk = 0; kk < N - M ; kk++ {
-			y = (mt[kk] & UPPER_MASK) | (mt[kk + 1] & LOWER_MASK)
-			mt[kk] = mt[kk + M] ^ (y >> 1) ^ mag01[y & 1]
+		for kk = 0; kk < _N - _M ; kk++ {
+			y = (mt[kk] & _UPPER_MASK) | (mt[kk + 1] & _LOWER_MASK)
+			mt[kk] = mt[kk + _M] ^ (y >> 1) ^ mag01[y & 1]
 		}
-		for ; kk < N - 1; kk++ {
-			y = (mt[kk] & UPPER_MASK) | (mt[kk + 1] & LOWER_MASK)
-			mt[kk] = mt[kk + (M - N)] ^ (y >> 1) ^ mag01[y & 1]
+		for ; kk < _N - 1; kk++ {
+			y = (mt[kk] & _UPPER_MASK) | (mt[kk + 1] & _LOWER_MASK)
+			mt[kk] = mt[kk + (_M - _N)] ^ (y >> 1) ^ mag01[y & 1]
 		}
-		y = (mt[N - 1] & UPPER_MASK) | (mt[0] & LOWER_MASK)
-		mt[N - 1] = mt[M - 1] ^ (y >> 1) ^ mag01[y & 1]
+		y = (mt[_N - 1] & _UPPER_MASK) | (mt[0] & _LOWER_MASK)
+		mt[_N - 1] = mt[_M - 1] ^ (y >> 1) ^ mag01[y & 1]
 
 		mti = 0
 	}
