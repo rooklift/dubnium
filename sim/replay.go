@@ -46,7 +46,7 @@ func (self *Replay) Dump(filename string) {
 
 	outfile, err := os.Create(filename)
 	if err != nil {
-		fmt.Printf("%v\n", err)
+		fmt.Fprintf(os.Stderr, "%v\n", err)
 		return
 	}
 	defer outfile.Close()
@@ -60,7 +60,7 @@ func (self *Replay) Dump(filename string) {
 	err = enc.Encode(self)
 
 	if err != nil {
-		fmt.Printf("%v\n", err)
+		fmt.Fprintf(os.Stderr, "%v\n", err)
 		return
 	}
 }

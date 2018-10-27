@@ -2,6 +2,7 @@ package sim
 
 import (
 	"fmt"
+	"os"
 	"strconv"
 	"strings"
 )
@@ -185,7 +186,7 @@ func (self *Game) UpdateFromMoves(all_player_moves []string) (string, *ReplayFra
 
 	for pid := 0; pid < players; pid++ {
 		if fails[pid] != "" {
-			fmt.Printf("%s\n", fails[pid])
+			fmt.Fprintf(os.Stderr, "%s\n", fails[pid])
 		}
 	}
 
