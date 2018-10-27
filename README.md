@@ -1,6 +1,6 @@
 # Dubnium 🐢
 
-Fully working alternate *engine* (not bot) for [Halite 3](https://github.com/HaliteChallenge/Halite-III). Build with `go build dubnium.go`
+Fully working alternate *engine* (not bot) for [Halite 3](https://github.com/HaliteChallenge/Halite-III). Build with `go build dubnium.go` or get a Windows binary from the [Releases](https://github.com/fohristiwhirl/dubnium/releases) section.
 
 Dubnium has its own mapgen. The seeds should be compatible with Official (please report any discrepancies you see).
 
