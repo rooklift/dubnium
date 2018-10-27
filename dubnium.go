@@ -12,8 +12,8 @@ import (
 	"strings"
 	"time"
 
+	"./mt19937_32"
 	"./sim"
-	"./sim/mt19937_32"
 )
 
 type BotOutput struct {

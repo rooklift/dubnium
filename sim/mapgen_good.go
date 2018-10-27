@@ -25,7 +25,7 @@ package sim
 
 import (
 	"math"
-	"./mt19937_32"
+	"../mt19937_32"
 )
 
 // AFAIK, perfectly faithful reproduction of the official mapgen in files:
