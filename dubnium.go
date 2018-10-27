@@ -224,6 +224,11 @@ func main() {
 		}
 	}
 
+	if viewer {
+		j, _ := json.Marshal(player_names)
+		fmt.Fprintf(os.Stderr, "{\"viewer_info\":{\"names\":%v}}\n", string(j))
+	}
+
 	replay := sim.NewReplay(player_names, game, turns, seed)
 
 	move_strings := make([]string, players)
