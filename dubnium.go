@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -40,8 +41,7 @@ func bot_handler(cmd string, pid int, io chan string, pregame string) {
 
 	i_pipe, _ := exec_command.StdinPipe()
 	o_pipe, _ := exec_command.StdoutPipe()
-
-	// No need to have a stderr pipe; without one it will go to /dev/null
+	e_pipe, _ := exec_command.StderrPipe()
 
 	err := exec_command.Start()
 	if err != nil {
@@ -50,6 +50,7 @@ func bot_handler(cmd string, pid int, io chan string, pregame string) {
 	}
 
 	if bot_is_kill == false {
+		go pipe_to_stderr(e_pipe, pid)
 		fmt.Fprintf(i_pipe, pregame)
 		if pregame[len(pregame) - 1] != '\n' {
 			fmt.Fprintf(i_pipe, "\n")
@@ -93,6 +94,14 @@ func bot_handler(cmd string, pid int, io chan string, pregame string) {
 		}
 	}
 }
+
+func pipe_to_stderr(p io.ReadCloser, pid int) {
+	scanner := bufio.NewScanner(p)
+	for scanner.Scan() {
+		fmt.Fprintf(os.Stderr, "Bot %v: %v\n", pid, scanner.Text())
+	}
+}
+
 
 // -----------------------------------------------------------------------------------------
 
