@@ -1,6 +1,9 @@
 package mt19937_32
 
-/*	The following license applies to this file:
+/*	Derived from:
+	http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/MT2002/CODES/mt19937ar.c
+
+	The following license applies to this file:
 
 	Copyright (c) 1997 - 2002, Makoto Matsumoto and Takuji Nishimura.
 	All rights reserved.
@@ -66,7 +69,7 @@ func Seed(s uint32) {
 
 func Urd() float64 {		// Mimic the behaviour of uniform_real_distribution in the C++ library I'm dealing with.
 	genrand_int32()			// Discard the first call to the RNG. (Why does this work???)
-	return Float64()
+	return genrand_real2()
 }
 
 // --------------------------------------------------------------------------------------
@@ -108,6 +111,9 @@ func genrand_int32() uint32 {									// [0,0xffffffff]
 
 	return y
 }
+
+// The C source does this * 1.0 / foo, is the multiplication needed??
+// It does generate different results for real1()
 
 func genrand_real1() float64 {									// [0,1]
 	return float64(genrand_int32()) * (1.0 / 4294967295.0)
