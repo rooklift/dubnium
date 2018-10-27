@@ -570,7 +570,7 @@ func turns_from_size(width, height int) int {
 
 func print_with_newline(s string) {
 	fmt.Printf(s)
-	if len(s) > 0 && s[len(s) - 1] != '\n' {
+	if len(s) == 0 || s[len(s) - 1] != '\n' {
 		fmt.Printf("\n")
 	}
 }
