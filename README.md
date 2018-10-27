@@ -1,6 +1,6 @@
 # 🐢 🐊 🦎 🐍
 
-Fully working alternate *engine* (not bot) for [Halite 3](https://github.com/HaliteChallenge/Halite-III).
+Fully working alternate *engine* (not bot) for [Halite 3](https://github.com/HaliteChallenge/Halite-III). Build with `go build dubnium.go`
 
 Dubnium has its own mapgen. The seeds should be compatible with Official (please report any discrepancies you see).
 
