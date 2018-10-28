@@ -24,6 +24,8 @@ type Replay struct {
 
 func NewReplay(names []string, game *Game, turns int, seed int32) *Replay {
 
+	// This should be called when game has its initial frame.
+
 	self := new(Replay)
 
 	self.EngineVersion = "Dubnium Engine"
