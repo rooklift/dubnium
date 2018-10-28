@@ -1,6 +1,6 @@
 # Dubnium 🐢
 
-Fully working alternate *engine* (not bot) for [Halite 3](https://github.com/HaliteChallenge/Halite-III). Build with `go build dubnium.go`
+Fully working alternate *engine* (not bot) for [Halite 3](https://github.com/HaliteChallenge/Halite-III). Build with `go build dubnium.go` or get a Windows build from the [Releases](https://github.com/fohristiwhirl/dubnium/releases).
 
 Although built for fun, one of its virtues is that it works with the [Iodine](https://github.com/fohristiwhirl/iodine) realtime game viewer.
 
