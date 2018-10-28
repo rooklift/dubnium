@@ -116,3 +116,24 @@ func make_cell_updates(old, current *Frame) []*CellUpdate {
 
 	return ret
 }
+
+func tokens_from_cmd_string(s string) []string {
+
+	// Tokens from string e.g. "g c 12 m 14 e m 20 w c 7" or "gc12m14em20wc7"
+
+	// The bot may concat without spaces and that's legal,
+	// so add spaces around letters (not numbers). Note that
+	// two numbers can never be legally sent consecutively,
+	// so this is all we need...
+
+	s = strings.Replace(s, "g", " g ", -1)
+	s = strings.Replace(s, "m", " m ", -1)
+	s = strings.Replace(s, "n", " n ", -1)
+	s = strings.Replace(s, "s", " s ", -1)
+	s = strings.Replace(s, "e", " e ", -1)
+	s = strings.Replace(s, "w", " w ", -1)
+	s = strings.Replace(s, "o", " o ", -1)
+	s = strings.Replace(s, "c", " c ", -1)
+
+	return strings.Fields(s)
+}

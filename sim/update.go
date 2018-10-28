@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"strconv"
-	"strings"
 )
 
 func (self *Game) UpdateFromMoves(all_player_moves []string) (string, *ReplayFrame) {
@@ -50,7 +49,7 @@ func (self *Game) UpdateFromMoves(all_player_moves []string) (string, *ReplayFra
 
 	for pid, s := range all_player_moves {
 
-		tokens := strings.Fields(s)
+		tokens := tokens_from_cmd_string(s)
 
 		command := ""				// g, c, m
 		sid := -1
