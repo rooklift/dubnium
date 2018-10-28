@@ -265,11 +265,14 @@ func (self *Game) UpdateFromMoves(all_player_moves []string) (string, *ReplayFra
 			continue
 		}
 
-		if ship.Halite >= new_frame.halite[ship.X][ship.Y] / 10 {		// We can move
+		mcr := self.Constants.MOVE_COST_RATIO
+		if ship.Inspired { mcr = self.Constants.INSPIRED_MOVE_COST_RATIO }	// See note far below on .Inspiration
 
-			if move != "" && move != "o" && move != "c" {				// We did move
+		if ship.Halite >= new_frame.halite[ship.X][ship.Y] / mcr {			// We can move
 
-				ship.Halite -= new_frame.halite[ship.X][ship.Y] / 10
+			if move != "" && move != "o" && move != "c" {					// We did move
+
+				ship.Halite -= new_frame.halite[ship.X][ship.Y] / mcr
 
 				dx, dy := string_to_dxdy(move)
 
@@ -393,7 +396,7 @@ func (self *Game) UpdateFromMoves(all_player_moves []string) (string, *ReplayFra
 				X: x,
 				Y: y,
 				Halite: 0,
-				Inspired: false,		// Doesn't really matter; but in official is this set correctly?
+				Inspired: false,		// Doesn't matter if inspiration only affects mining
 			}
 
 			new_frame.ships = append(new_frame.ships, ship)
@@ -428,7 +431,10 @@ func (self *Game) UpdateFromMoves(all_player_moves []string) (string, *ReplayFra
 
 			// Normal mining...
 
-			amount_to_mine := (new_frame.halite[ship.X][ship.Y] + self.Constants.EXTRACT_RATIO - 1) / self.Constants.EXTRACT_RATIO
+			exrat := self.Constants.EXTRACT_RATIO
+			if ship.Inspired { exrat = self.Constants.INSPIRED_EXTRACT_RATIO }		// See note below on .Inspiration
+
+			amount_to_mine := (new_frame.halite[ship.X][ship.Y] + exrat - 1) / exrat
 
 			if amount_to_mine + ship.Halite >= self.Constants.MAX_ENERGY {
 				amount_to_mine = self.Constants.MAX_ENERGY - ship.Halite
@@ -439,7 +445,7 @@ func (self *Game) UpdateFromMoves(all_player_moves []string) (string, *ReplayFra
 
 			// Inspired bonus... (doesn't remove halite from ground)
 
-			if ship.Inspired {
+			if ship.Inspired {				// See note below on .Inspiration
 
 				inspired_bonus := amount_to_mine * ibm
 
@@ -452,7 +458,10 @@ func (self *Game) UpdateFromMoves(all_player_moves []string) (string, *ReplayFra
 		}
 	}
 
-	// Fix inspiration of the new frame...
+	// Fix inspiration of the new frame's ships.
+	//
+	// Up till now, they had the previous frame's values, which meant
+	// it was OK to use the new objects' .Inspired values, above.
 
 	new_frame.fix_inspiration(
 		self.Constants.INSPIRATION_RADIUS,

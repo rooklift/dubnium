@@ -44,10 +44,10 @@ func NewConstants(players, width, height, turns int, seed int32) *Constants {
 		DEFAULT_MAP_HEIGHT:			height,
 		DEFAULT_MAP_WIDTH:			width,
 		DROPOFF_COST:				4000,
-		DROPOFF_PENALTY_RATIO:		4,			// What's this?
+		DROPOFF_PENALTY_RATIO:		4,			// Obsolete
 		EXTRACT_RATIO:				4,
-		FACTOR_EXP_1:				2,
-		FACTOR_EXP_2:				2,
+		FACTOR_EXP_1:				2,			// Mapgen
+		FACTOR_EXP_2:				2,			// Mapgen
 		INITIAL_ENERGY:				5000,
 		INSPIRATION_ENABLED:		true,
 		INSPIRATION_RADIUS:			4,
@@ -60,12 +60,12 @@ func NewConstants(players, width, height, turns int, seed int32) *Constants {
 		MAX_PLAYERS:				16,
 		MAX_TURNS:					turns,
 		MAX_TURN_THRESHOLD:			64,			// What's this?
-		MIN_CELL_PRODUCTION:		900,
-		MIN_TURNS:					400,
+		MIN_CELL_PRODUCTION:		900,		// Misnamed
+		MIN_TURNS:					400,		// ??
 		MIN_TURN_THRESHOLD:			32,			// What's this?
 		MOVE_COST_RATIO:			10,
 		NEW_ENTITY_ENERGY_COST:		1000,
-		PERSISTENCE:				0.7,
+		PERSISTENCE:				0.7,		// Mapgen
 		SHIPS_ABOVE_FOR_CAPTURE:	3,
 		STRICT_ERRORS:				false,
 
