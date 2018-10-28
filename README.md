@@ -6,4 +6,4 @@ Although built for fun, one of its virtues is that it works with the [Iodine](ht
 
 The RNG is deliberately identical to Official. On normal sized maps, a seed should give the same map as Official (please report any discrepancies you see).
 
-On the same map, using deterministic bots, Dubnium should produce the exact same outcome as Official, except that ships are sent to the bots in a different order, which will cause discrepancies for bots that don't sort their ships.
+On the same map, using deterministic bots, Dubnium should produce the exact same outcome as Official, except that ships are sent to the bots in a different order, and may be generated with different IDs (still consecutive), which may cause discrepancies for some bots.
