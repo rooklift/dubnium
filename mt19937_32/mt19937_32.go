@@ -49,12 +49,14 @@ var mti int = _N + 1
 
 // --------------------------------------------------------------------------------------
 
-func Float64() float64 {
-	 return genrand_real2()
+func Float64() float64 {												// [0,1)
+	 return float64(Uint32()) / (float64(0xffffffff) + 1.0)
 }
 
-func Uint32() uint32 {
-	return genrand_int32()
+func Urd() float64 {		// Mimic the behaviour of uniform_real_distribution in C++ when used with mt19937
+	var minor float64 = float64(Uint32()) / float64(0xffffffffffffffff)
+	var major float64 = float64(Uint32()) / (float64(0xffffffff) + 1.0)
+	return major + minor;
 }
 
 func Seed(s uint32) {
@@ -67,14 +69,10 @@ func Seed(s uint32) {
 	}
 }
 
-func Urd() float64 {		// Mimic the behaviour of uniform_real_distribution in the C++ library I'm dealing with.
-	genrand_int32()			// Discard the first call to the RNG. (Why does this work???)
-	return genrand_real2()
-}
-
 // --------------------------------------------------------------------------------------
+// The real thing:
 
-func genrand_int32() uint32 {									// [0,0xffffffff]
+func Uint32() uint32 {													// [0,0xffffffff]
 
 	var y uint32
 	var mag01 [2]uint32 = [2]uint32{0, _MATRIX_A}
@@ -110,15 +108,4 @@ func genrand_int32() uint32 {									// [0,0xffffffff]
 	y ^= (y >> 18)
 
 	return y
-}
-
-// The C source does this * 1.0 / foo, is the multiplication needed??
-// It does generate different results for real1()
-
-func genrand_real1() float64 {									// [0,1]
-	return float64(genrand_int32()) * (1.0 / 4294967295.0)
-}
-
-func genrand_real2() float64 {									// [0,1)
-	return float64(genrand_int32()) * (1.0 / 4294967296.0)
 }
