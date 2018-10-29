@@ -50,12 +50,12 @@ var mti int = _N + 1
 // --------------------------------------------------------------------------------------
 
 func Float64() float64 {												// [0,1)
-	 return float64(Uint32()) / (float64(0xffffffff) + 1.0)
+	 return float64(Uint32()) / float64(0x100000000)
 }
 
 func Urd() float64 {		// Mimic the behaviour of uniform_real_distribution in C++ when used with mt19937
 	var minor float64 = float64(Uint32()) / float64(0xffffffffffffffff)
-	var major float64 = float64(Uint32()) / (float64(0xffffffff) + 1.0)
+	var major float64 = float64(Uint32()) / float64(0x100000000)
 	return major + minor;
 }
 
@@ -65,7 +65,6 @@ func Seed(s uint32) {
 
 	for mti = 1; mti < _N; mti++ {
 		mt[mti] = (uint32(1812433253) * (mt[mti - 1] ^ (mt[mti - 1] >> 30)) + uint32(mti))
-		mt[mti] &= uint32(0xffffffff)	// Can likely comment this out, looks like a no-op in Go.
 	}
 }
 
