@@ -27,6 +27,16 @@ func (self *Frame) Players() int {
 	return len(self.budgets)
 }
 
+func (self *Frame) TotalHalite() int {
+	count := 0
+	for x := 0; x < self.Width(); x++ {
+		for y := 0; y < self.Height(); y++ {
+			count += self.halite[x][y]
+		}
+	}
+	return count
+}
+
 func (self *Frame) Copy() *Frame {
 
 	new_frame := new(Frame)
