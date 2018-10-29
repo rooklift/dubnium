@@ -384,8 +384,12 @@ func (self *Game) UpdateFromMoves(all_player_moves []string) (string, *ReplayFra
 			x := factory.X
 			y := factory.Y
 
-			if collision_points[Position{x, y}] {		// Cancel the spawn due to collision
-				continue
+			// The spawn is cancelled iff there is only 1 other ship present
+			// (which is itself destroyed) but if there's 2 (or more) they
+			// delete each other before the spawn, which succeeds.
+
+			if len(ship_positions[Position{x, y}]) == 1 {
+				continue	// i.e. cancel spawn
 			}
 
 			sid := len(new_frame.ships)
