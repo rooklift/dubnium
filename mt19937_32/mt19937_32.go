@@ -61,7 +61,7 @@ func Urd() float64 {		// Mimic the behaviour of uniform_real_distribution in C++
 
 func Seed(s uint32) {
 
-	mt[0] = s & uint32(0xffffffff)
+	mt[0] = s
 
 	for mti = 1; mti < _N; mti++ {
 		mt[mti] = (uint32(1812433253) * (mt[mti - 1] ^ (mt[mti - 1] >> 30)) + uint32(mti))
