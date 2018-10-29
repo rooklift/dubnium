@@ -378,9 +378,9 @@ func main() {
 		type PrintedStats struct {
 			MapWidth		int					`json:"map_width"`
 			MapHeight		int					`json:"map_height"`
+			MapSeed			int32				`json:"map_seed"`
 			Replay			string				`json:"replay"`
 			Stats			map[int]RankScore	`json:"stats"`
-			MapSeed			int32				`json:"map_seed"`
 			Time			string				`json:"time"`
 		}
 
