@@ -190,7 +190,7 @@ func (self *Game) UpdateFromMoves(all_player_moves []string) (string, *ReplayFra
 			fmt.Fprintf(os.Stderr, "%s\n", fails[pid])
 
 			if new_frame.IsAlive(pid) {
-				new_frame.Kill(pid)
+				new_frame.Kill(pid, -2)
 			}
 		}
 	}

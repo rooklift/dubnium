@@ -210,7 +210,7 @@ func main() {
 			for pid := 0; pid < players; pid++ {
 				if player_names[pid] == "" {
 					player_names[pid] = "Non-starter (time)"
-					game.Kill(pid)
+					game.Kill(pid, 0)
 				}
 			}
 
@@ -297,7 +297,7 @@ func main() {
 					for pid := 0; pid < players; pid++ {
 						if received[pid] == false {
 							move_strings[pid] = ""
-							game.Kill(pid)
+							game.Kill(pid, -1)
 							fmt.Fprintf(os.Stderr, "Hit the deadline. Killing bot %v\n", pid)
 						}
 					}

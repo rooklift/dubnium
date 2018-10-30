@@ -42,8 +42,10 @@ func (self *Frame) IsAlive(pid int) bool {
 	return self.last_alive[pid] == -1
 }
 
-func (self *Frame) Kill(pid int) {
-	self.last_alive[pid] = self.turn
+func (self *Frame) Kill(pid, turn_offset int) {
+	t := self.turn + turn_offset
+	if t < 0 { t = 0 }
+	self.last_alive[pid] = t
 }
 
 func (self *Frame) DeathTime(pid int) int {
@@ -274,8 +276,8 @@ func (self *Game) IsAlive(pid int) bool {
 	return self.frame.IsAlive(pid)
 }
 
-func (self *Game) Kill(pid int) {
-	self.frame.Kill(pid)
+func (self *Game) Kill(pid, turn_offset int) {
+	self.frame.Kill(pid, turn_offset)
 }
 
 func (self *Game) DeathTime(pid int) int {
