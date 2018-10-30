@@ -301,6 +301,7 @@ func main() {
 						if received[pid] == false {
 							move_strings[pid] = ""
 							crash_list[pid] = turn
+							fmt.Fprintf(os.Stderr, "Hit the deadline. Killing bot %v\n", pid)
 						}
 					}
 
@@ -569,7 +570,7 @@ func turns_from_size(width, height int) int {
 		size = height
 	}
 
-	return (((size - 32) * 25) / 8) + 400
+	return ((size * 25) / 8) + 300
 }
 
 func print_with_newline(s string) {
