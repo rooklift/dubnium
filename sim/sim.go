@@ -8,6 +8,7 @@ import (
 
 type Frame struct {
 	turn						int
+	last_alive					[]int
 	budgets						[]int
 	deposited					[]int
 	halite						[][]int
@@ -37,6 +38,18 @@ func (self *Frame) TotalHalite() int {
 	return count
 }
 
+func (self *Frame) IsAlive(pid int) bool {
+	return self.last_alive[pid] == -1
+}
+
+func (self *Frame) Kill(pid int) {
+	self.last_alive[pid] = self.turn
+}
+
+func (self *Frame) DeathTime(pid int) int {
+	return self.last_alive[pid]
+}
+
 func (self *Frame) Copy() *Frame {
 
 	new_frame := new(Frame)
@@ -50,6 +63,10 @@ func (self *Frame) Copy() *Frame {
 
 	for _, deposited := range self.deposited {
 		new_frame.deposited = append(new_frame.deposited, deposited)
+	}
+
+	for _, la := range self.last_alive {
+		new_frame.last_alive = append(new_frame.last_alive, la)
 	}
 
 	// ---------------------------------------------------------------
@@ -169,6 +186,8 @@ func (self *Frame) fix_inspiration(RADIUS int, SHIPS_NEEDED int) {
 	}
 }
 
+// ------------------------------------------------------------------------------------------
+
 type Game struct {
 	Constants					*Constants
 	frame						*Frame
@@ -249,6 +268,18 @@ func (self *Game) GetDropoffs() []*Dropoff {				// Needed for replay stats
 
 func (self *Game) Budget(pid int) int {
 	return self.frame.budgets[pid]
+}
+
+func (self *Game) IsAlive(pid int) bool {
+	return self.frame.IsAlive(pid)
+}
+
+func (self *Game) Kill(pid int) {
+	self.frame.Kill(pid)
+}
+
+func (self *Game) DeathTime(pid int) int {
+	return self.frame.DeathTime(pid)
 }
 
 type Dropoff struct {

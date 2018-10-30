@@ -181,30 +181,36 @@ func (self *Game) UpdateFromMoves(all_player_moves []string) (string, *ReplayFra
 		}
 	}
 
-	// Print info on fails...
+	// Print info on fails and kill player...
 
 	for pid := 0; pid < players; pid++ {
+
 		if fails[pid] != "" {
+
 			fmt.Fprintf(os.Stderr, "%s\n", fails[pid])
+
+			if new_frame.IsAlive(pid) {
+				new_frame.Kill(pid)
+			}
 		}
 	}
 
-	// Clear gens / budgets of dying players...
+	// Clear gens / budgets of dead players...
 
 	for pid := 0; pid < players; pid++ {
-		if fails[pid] != "" {
+		if new_frame.IsAlive(pid) == false {
 			gens[pid] = false
 			new_frame.budgets[pid] = 0
 		}
 	}
 
-	// Clear all ships of dying players...
+	// Clear all ships of dead players...
 
 	for i, ship := range new_frame.ships {
 		if ship == nil {
 			continue
 		}
-		if fails[ship.Owner] != "" {
+		if new_frame.IsAlive(ship.Owner) == false {
 			new_frame.ships[i] = nil
 		}
 	}

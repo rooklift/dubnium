@@ -144,12 +144,6 @@ func main() {
 		io_chans[pid] = make(chan string)
 	}
 
-	var crash_list []int
-
-	for pid := 0; pid < players; pid++ {
-		crash_list = append(crash_list, -1)
-	}
-
 	constants := sim.NewConstants(players, width, height, turns, seed)
 	game := sim.NewGame(constants)
 
@@ -216,7 +210,7 @@ func main() {
 			for pid := 0; pid < players; pid++ {
 				if player_names[pid] == "" {
 					player_names[pid] = "Non-starter (time)"
-					crash_list[pid] = 0
+					game.Kill(pid)
 				}
 			}
 
@@ -233,6 +227,8 @@ func main() {
 
 	move_strings := make([]string, players)
 
+	// -----------------------------------------------------------------------------------------------------------------------
+
 	for turn := 0; turn <= turns; turn++ {				// Don't mess with this now, we expect <= below...
 
 		update_string, rf := game.UpdateFromMoves(move_strings)
@@ -242,7 +238,7 @@ func main() {
 
 		if turn < turns {
 			for pid := 0; pid < players; pid++ {
-				if crash_list[pid] == -1 {
+				if game.IsAlive(pid) {
 					io_chans[pid] <- update_string		// THIS WILL HANG THE ENGINE IF THE HANDLER ISN'T AT THE RIGHT PLACE. Care!
 				}
 			}
@@ -255,11 +251,12 @@ func main() {
 		received := make([]bool, players)
 		received_total := 0
 
-		// Count dead players as already received ""
-		// Also do this for all bots on the very final frame.
+		// Count dead players as already received "".
+		// Also do this for all bots on the very final
+		// frame (which is not updated).
 
 		for pid := 0; pid < players; pid++ {
-			if crash_list[pid] != -1 || turn == turns {
+			if game.IsAlive(pid) == false || turn == turns {
 				move_strings[pid] = ""
 				received[pid] = true
 				received_total++
@@ -279,7 +276,7 @@ func main() {
 
 				case op := <- bot_output_chan:
 
-					if crash_list[op.Pid] == -1 {		// Bot hasn't crashed (if it had, we already pretended it sent "")
+					if game.IsAlive(op.Pid) {		// Bot hasn't crashed (if it had, we already pretended it sent "")
 
 						received_total++
 						received[op.Pid] = true
@@ -300,7 +297,7 @@ func main() {
 					for pid := 0; pid < players; pid++ {
 						if received[pid] == false {
 							move_strings[pid] = ""
-							crash_list[pid] = turn
+							game.Kill(pid)
 							fmt.Fprintf(os.Stderr, "Hit the deadline. Killing bot %v\n", pid)
 						}
 					}
@@ -317,6 +314,8 @@ func main() {
 			time.Sleep(wanted - elapsed)
 		}
 	}
+
+	// -----------------------------------------------------------------------------------------------------------------------
 
 	_, rf := game.UpdateFromMoves(move_strings)
 	replay.FullFrames = append(replay.FullFrames, rf)
@@ -335,8 +334,8 @@ func main() {
 		replay.Stats.Pstats[pid].FinalProduction = game.Budget(pid)
 
 		turn_last_alive := turns + 1		// Like in official replays
-		if crash_list[pid] != -1 {
-			turn_last_alive = crash_list[pid]
+		if game.IsAlive(pid) == false {
+			turn_last_alive = game.DeathTime(pid)
 		}
 
 		replay.Stats.Pstats[pid].LastTurnAlive = turn_last_alive

@@ -41,6 +41,7 @@ func MapGenOfficial(players, width, height, player_energy int, seed int32) *Fram
 	for pid := 0; pid < players; pid++ {
 		frame.budgets = append(frame.budgets, player_energy)
 		frame.deposited = append(frame.deposited, 0)
+		frame.last_alive = append(frame.last_alive, -1)
 	}
 
 	frame.halite = make_2d_int_array(width, height)
