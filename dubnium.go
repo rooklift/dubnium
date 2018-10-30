@@ -89,7 +89,7 @@ func bot_handler(cmd string, pid int, io chan string, pregame string) {
 
 		} else {
 
-			bot_output_chan <- BotOutput{pid, ""}
+			// Nothing, just let it time out
 
 		}
 	}
