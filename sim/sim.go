@@ -8,6 +8,7 @@ import (
 
 type Frame struct {
 	turn						int
+	last_alive					[]int
 	budgets						[]int
 	deposited					[]int
 	halite						[][]int
@@ -37,6 +38,20 @@ func (self *Frame) TotalHalite() int {
 	return count
 }
 
+func (self *Frame) IsAlive(pid int) bool {
+	return self.last_alive[pid] == -1
+}
+
+func (self *Frame) Kill(pid, turn_offset int) {
+	t := self.turn + turn_offset
+	if t < 0 { t = 0 }
+	self.last_alive[pid] = t
+}
+
+func (self *Frame) DeathTime(pid int) int {
+	return self.last_alive[pid]
+}
+
 func (self *Frame) Copy() *Frame {
 
 	new_frame := new(Frame)
@@ -50,6 +65,10 @@ func (self *Frame) Copy() *Frame {
 
 	for _, deposited := range self.deposited {
 		new_frame.deposited = append(new_frame.deposited, deposited)
+	}
+
+	for _, la := range self.last_alive {
+		new_frame.last_alive = append(new_frame.last_alive, la)
 	}
 
 	// ---------------------------------------------------------------
@@ -169,6 +188,8 @@ func (self *Frame) fix_inspiration(RADIUS int, SHIPS_NEEDED int) {
 	}
 }
 
+// ------------------------------------------------------------------------------------------
+
 type Game struct {
 	Constants					*Constants
 	frame						*Frame
@@ -223,6 +244,7 @@ func (self *Game) BotInitString() string {
 func (self *Game) GetRank(pid int) int {
 
 	money := self.frame.budgets[pid]
+	la := self.frame.last_alive[pid]
 	rank := 1
 
 	for n := 0; n < self.frame.Players(); n++ {
@@ -231,7 +253,11 @@ func (self *Game) GetRank(pid int) int {
 			continue
 		}
 
-		if self.frame.budgets[n] > money {
+		if self.frame.last_alive[n] > la && la != -1 {				// They survived longer
+			rank++
+		} else if self.frame.last_alive[n] == -1 && la != -1 {		// They survived to the end, and we didn't
+			rank++
+		} else if self.frame.budgets[n] > money {					// They ended with more money
 			rank++
 		}
 	}
@@ -239,7 +265,7 @@ func (self *Game) GetRank(pid int) int {
 	return rank
 }
 
-func (self *Game) GetDropoffs() []*Dropoff {				// Needed for replay stats
+func (self *Game) GetDropoffs() []*Dropoff {						// Needed for replay stats
 	var ret []*Dropoff
 	for _, dropoff := range self.frame.dropoffs {
 		ret = append(ret, dropoff)
@@ -249,6 +275,18 @@ func (self *Game) GetDropoffs() []*Dropoff {				// Needed for replay stats
 
 func (self *Game) Budget(pid int) int {
 	return self.frame.budgets[pid]
+}
+
+func (self *Game) IsAlive(pid int) bool {
+	return self.frame.IsAlive(pid)
+}
+
+func (self *Game) Kill(pid, turn_offset int) {
+	self.frame.Kill(pid, turn_offset)
+}
+
+func (self *Game) DeathTime(pid int) int {
+	return self.frame.DeathTime(pid)
 }
 
 type Dropoff struct {

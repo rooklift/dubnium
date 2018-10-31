@@ -46,6 +46,7 @@ func FrameFromFile(infile string) (*Frame, int32) {
 	for pid := 0; pid < players; pid++ {
 		frame.budgets = append(frame.budgets, foo.Constants.INITIAL_ENERGY)
 		frame.deposited = append(frame.deposited, 0)
+		frame.last_alive = append(frame.last_alive, -1)
 	}
 
 	frame.halite = make_2d_int_array(width, height)
