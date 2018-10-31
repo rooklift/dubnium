@@ -244,6 +244,7 @@ func (self *Game) BotInitString() string {
 func (self *Game) GetRank(pid int) int {
 
 	money := self.frame.budgets[pid]
+	la := self.frame.last_alive[pid]
 	rank := 1
 
 	for n := 0; n < self.frame.Players(); n++ {
@@ -252,7 +253,11 @@ func (self *Game) GetRank(pid int) int {
 			continue
 		}
 
-		if self.frame.budgets[n] > money {
+		if self.frame.last_alive[n] > la && la != -1 {				// They survived longer
+			rank++
+		} else if self.frame.last_alive[n] == -1 && la != -1 {		// They survived to the end, and we didn't
+			rank++
+		} else if self.frame.budgets[n] > money {					// They ended with more money
 			rank++
 		}
 	}
@@ -260,7 +265,7 @@ func (self *Game) GetRank(pid int) int {
 	return rank
 }
 
-func (self *Game) GetDropoffs() []*Dropoff {				// Needed for replay stats
+func (self *Game) GetDropoffs() []*Dropoff {						// Needed for replay stats
 	var ret []*Dropoff
 	for _, dropoff := range self.frame.dropoffs {
 		ret = append(ret, dropoff)
