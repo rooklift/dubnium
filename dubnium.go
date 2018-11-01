@@ -12,7 +12,6 @@ import (
 	"strings"
 	"time"
 
-	"./mt19937_32"
 	"./sim"
 )
 
@@ -133,7 +132,7 @@ func main() {
 		return
 	}
 
-	if players < 1 || players > 4 {
+	if players < 1 || (players > 4 && provided_frame == nil) {
 		fmt.Fprintf(os.Stderr, "Bad number of players: %d\n", players)
 		return
 	}
@@ -554,13 +553,11 @@ func parse_args() (
 		botlist = append(botlist, arg)
 	}
 
-	mt19937_32.Seed(uint32(seed))		// Use the seed to get width/height, if needed...
-
 	if width == 0 && height > 0 { width = height }
 	if height == 0 && width > 0 { height = width }
 
 	if width < 2 || width > 128 || height < 2 || height > 128 {
-		width = 32 + int(mt19937_32.Uint32() % 5) * 8
+		width = sim.SizeFromSeed(uint32(seed))
 		height = width
 	}
 

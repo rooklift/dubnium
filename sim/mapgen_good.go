@@ -32,6 +32,11 @@ import (
 // game_engine/mapgen/FractalValueNoiseTileGenerator.cpp
 // game_engine/mapgen/SymmetricalTile.cpp
 
+func SizeFromSeed(seed uint32) int {
+	mt19937_32.Seed(seed)
+	return 32 + int(mt19937_32.Uint32() % 5) * 8
+}
+
 func MapGenOfficial(players, width, height, player_energy int, seed int32) *Frame {
 
 	mt19937_32.Seed(uint32(seed))
