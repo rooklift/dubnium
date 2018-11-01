@@ -109,12 +109,17 @@ func main() {
 	start_time := time.Now()
 
 	// This stuff should be a struct I guess...
-	width, height, sleep, seed, no_timeout, no_replay, viewer, folder, infile, botlist := parse_args()
+	width, height, sleep, seed, no_timeout, no_replay, viewer, folder, infile, inPNG, botlist := parse_args()
 
 	var provided_frame *sim.Frame
 
 	if infile != "" {
 		provided_frame, seed = sim.FrameFromFile(infile)
+	} else if inPNG != "" {
+		provided_frame = sim.FrameFromPNG(inPNG)
+	}
+
+	if provided_frame != nil {
 		width = provided_frame.Width()
 		height = provided_frame.Height()
 	}
@@ -122,11 +127,6 @@ func main() {
 	turns := turns_from_size(width, height)
 
 	players := len(botlist)
-
-	if players > 4 {
-		fmt.Fprintf(os.Stderr, "Too many players (%d)\n", players)
-		return
-	}
 
 	if provided_frame != nil && provided_frame.Players() != players {
 		fmt.Fprintf(os.Stderr, "Wrong number of bots (%d) given for this replay (need %d)\n", players, provided_frame.Players())
@@ -416,7 +416,7 @@ func parse_args() (
 		width, height, sleep int,
 		seed int32,
 		no_timeout, no_replay, viewer bool,
-		folder, infile string,
+		folder, infile, inPNG string,
 		botlist []string) {
 
 	seed = int32(time.Now().UTC().Unix())
@@ -482,6 +482,13 @@ func parse_args() (
 			dealt_with[n] = true
 			dealt_with[n + 1] = true
 			infile = os.Args[n + 1]
+			continue
+		}
+
+		if arg == "--png" || arg == "-g" {
+			dealt_with[n] = true
+			dealt_with[n + 1] = true
+			inPNG = os.Args[n + 1]
 			continue
 		}
 
@@ -557,7 +564,7 @@ func parse_args() (
 		height = width
 	}
 
-	return width, height, sleep, seed, no_timeout, no_replay, viewer, folder, infile, botlist
+	return width, height, sleep, seed, no_timeout, no_replay, viewer, folder, infile, inPNG, botlist
 }
 
 // -----------------------------------------------------------------------------------------
