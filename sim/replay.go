@@ -15,14 +15,14 @@ type Replay struct {
 	FileVersion					int					`json:"REPLAY_FILE_VERSION"`
 	FullFrames					[]*ReplayFrame		`json:"full_frames"`
 	Stats						*ReplayStats		`json:"game_statistics"`
-	Seed						int32				`json:"map_generator_seed"`
+	Seed						uint32				`json:"map_generator_seed"`
 	NumPlayers					int					`json:"number_of_players"`
 	Players						[]*ReplayPlayer		`json:"players"`
 	ProductionMap				*ReplayMap			`json:"production_map"`
 
 }
 
-func NewReplay(names []string, game *Game, turns int, seed int32) *Replay {
+func NewReplay(names []string, game *Game, turns int, seed uint32) *Replay {
 
 	// This should be called when game has its initial frame.
 

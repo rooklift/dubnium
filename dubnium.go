@@ -377,7 +377,7 @@ func main() {
 		type PrintedStats struct {
 			MapWidth		int					`json:"map_width"`
 			MapHeight		int					`json:"map_height"`
-			MapSeed			int32				`json:"map_seed"`
+			MapSeed			uint32				`json:"map_seed"`
 			Replay			string				`json:"replay"`
 			Stats			map[int]RankScore	`json:"stats"`
 			Time			string				`json:"time"`
@@ -413,12 +413,12 @@ func main() {
 
 func parse_args() (
 		width, height, sleep int,
-		seed int32,
+		seed uint32,
 		no_timeout, no_replay, viewer bool,
 		folder, infile, inPNG string,
 		botlist []string) {
 
-	seed = int32(time.Now().UTC().Unix())
+	seed = uint32(time.Now().UTC().Unix())
 	folder = "./"
 
 	dealt_with := make([]bool, len(os.Args))
@@ -462,7 +462,7 @@ func parse_args() (
 				fmt.Fprintf(os.Stderr, "Couldn't understand stated seed.\n")
 				os.Exit(1)
 			}
-			seed = int32(seed64)
+			seed = uint32(seed64)
 			continue
 		}
 
@@ -557,7 +557,7 @@ func parse_args() (
 	if height == 0 && width > 0 { height = width }
 
 	if width < 2 || width > 128 || height < 2 || height > 128 {
-		width = sim.SizeFromSeed(uint32(seed))
+		width = sim.SizeFromSeed(seed)
 		height = width
 	}
 

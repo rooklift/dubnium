@@ -37,9 +37,9 @@ func SizeFromSeed(seed uint32) int {
 	return 32 + int(mt19937_32.Uint32() % 5) * 8
 }
 
-func MapGenOfficial(players, width, height, player_energy int, seed int32) *Frame {
+func MapGenOfficial(players, width, height, player_energy int, seed uint32) *Frame {
 
-	mt19937_32.Seed(uint32(seed))
+	mt19937_32.Seed(seed)
 
 	frame := new(Frame)
 
