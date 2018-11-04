@@ -1,5 +1,8 @@
 package main
 
+// This program is irrelevant for Dubnium itself, but uses
+// Dubnium's mapgen to find extreme seeds.
+
 import (
 	"bufio"
 	"encoding/json"
