@@ -312,38 +312,31 @@ func (self *Game) UpdateFromMoves(all_player_moves []string) (string, *ReplayFra
 
 	collision_points := make(map[Position]bool)
 
-	for x := 0; x < width; x++ {
+	for point, ships_here := range ship_positions {
 
-		for y := 0; y < height; y++ {
+		x, y := point.X, point.Y
 
-			ships_here := ship_positions[Position{x, y}]
-
-			if len(ships_here) == 0 {
-				continue
-			}
-
-			if len(ships_here) == 1 && attempted_spawn_points[Position{x, y}] == false {
-				continue
-			}
-
-			// Collision...
-
-			collision_points[Position{x, y}] = true
-
-			var wreckedsids []int
-
-			for _, ship := range ships_here {
-				new_frame.ships[ship.Sid] = nil
-				new_frame.halite[x][y] += ship.Halite			// Dump the halite on the ground.
-				wreckedsids = append(wreckedsids, ship.Sid)
-			}
-
-			rf.Events = append(rf.Events, &ReplayEvent{
-				Location: &Position{x, y},
-				WreckedSids: wreckedsids,
-				Type: "shipwreck",
-			})
+		if len(ships_here) == 1 && attempted_spawn_points[Position{x, y}] == false {
+			continue
 		}
+
+		// Collision...
+
+		collision_points[Position{x, y}] = true
+
+		var wreckedsids []int
+
+		for _, ship := range ships_here {
+			new_frame.ships[ship.Sid] = nil
+			new_frame.halite[x][y] += ship.Halite			// Dump the halite on the ground.
+			wreckedsids = append(wreckedsids, ship.Sid)
+		}
+
+		rf.Events = append(rf.Events, &ReplayEvent{
+			Location: &Position{x, y},
+			WreckedSids: wreckedsids,
+			Type: "shipwreck",
+		})
 	}
 
 	// Deliveries...
