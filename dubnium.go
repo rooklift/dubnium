@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"./sim"
@@ -21,6 +22,10 @@ type BotOutput struct {
 }
 
 var bot_output_chan = make(chan BotOutput)		// Shared by all bot handlers.
+
+var all_stdin_pipes []io.WriteCloser
+var all_running_processes []*exec.Cmd
+var MUTEX sync.Mutex
 
 // -----------------------------------------------------------------------------------------
 
@@ -46,6 +51,11 @@ func bot_handler(cmd string, pid int, io chan string, pregame string) {
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to start bot %d (%s)\n", pid, cmd)
 		bot_is_kill = true
+	} else {
+		MUTEX.Lock()
+		all_running_processes = append(all_running_processes, exec_command)
+		all_stdin_pipes = append(all_stdin_pipes, i_pipe)
+		MUTEX.Unlock()
 	}
 
 	if bot_is_kill == false {
@@ -406,6 +416,18 @@ func main() {
 
 		fmt.Printf(string(foo))
 		fmt.Printf("\n")
+	}
+
+	// Kill the bots fairly gracefully...
+
+	for _, pipe := range all_stdin_pipes {
+		pipe.Close()
+	}
+
+	time.Sleep(250 * time.Millisecond)
+
+	for _, cmd := range all_running_processes {
+		cmd.Process.Kill()
 	}
 }
 
