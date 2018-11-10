@@ -50,7 +50,7 @@ var mti int = _N + 1
 // --------------------------------------------------------------------------------------
 
 func Float64() float64 {												// [0,1)
-	 return float64(Uint32()) / float64(0x100000000)
+	return float64(Uint32()) / float64(0x100000000)
 }
 
 func Urd() float64 {		// Mimic the behaviour of uniform_real_distribution in C++ when used with mt19937
