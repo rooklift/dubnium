@@ -5,7 +5,38 @@ import (
 	"testing"
 )
 
+func TestExamples(t *testing.T) {
+
+	s := uint32(5489)
+
+	fmt.Printf("\n")
+
+	Seed(s)
+	fmt.Printf("10 outputs of Uint32(), seed was %v:\n", s)
+	for n := 0; n < 10; n++ {
+		fmt.Printf("%10v ", Uint32())
+		if n % 5 == 4 {
+			fmt.Printf("\n")
+		}
+	}
+
+	fmt.Printf("\n")
+
+	Seed(s)
+	fmt.Printf("10 outputs of Float64(), seed was %v:\n", s)
+	for n := 0; n < 10; n++ {
+		fmt.Printf("%-10.8v ", Float64())
+		if n % 5 == 4 {
+			fmt.Printf("\n")
+		}
+	}
+
+	fmt.Printf("\n")
+}
+
 func TestUint32(t *testing.T) {
+
+	Seed(5489)			// The default seed
 
 	var z uint32
 
@@ -14,7 +45,7 @@ func TestUint32(t *testing.T) {
 	}
 
 	if z != 4123659995 {
-		t.Errorf("Expected 4123659995 after 10000 calls on unseeded RNG, got %v\n", z)
+		t.Errorf("Expected 4123659995 after 10000 calls on default-seeded RNG, got %v\n", z)
 	}
 }
 
@@ -61,3 +92,4 @@ func TestUrd(t *testing.T) {
 		}
 	}
 }
+
