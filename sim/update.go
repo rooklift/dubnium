@@ -142,8 +142,8 @@ func (self *Game) UpdateFromMoves(all_player_moves []string) (string, *ReplayFra
 
 	new_frame := self.frame.Copy()
 	new_frame.turn += 1
-
-	// Best just pretend ships with no move did in fact issue a "o" order...
+/*
+	// Pretend ships with no move did in fact issue a "o" order... (why did I do this?)
 
 	for _, ship := range self.frame.ships {
 		if ship == nil {
@@ -153,7 +153,7 @@ func (self *Game) UpdateFromMoves(all_player_moves []string) (string, *ReplayFra
 			moves[ship.Sid] = "o"
 		}
 	}
-
+*/
 	// Adjust budgets...
 
 	for pid := 0; pid < players; pid++ {
@@ -494,7 +494,7 @@ func (self *Game) UpdateFromMoves(all_player_moves []string) (string, *ReplayFra
 				Type: "c",
 				Sid: sid,
 			})
-		} else {
+		} else if move != "" {
 			rf.Moves[pid] = append(rf.Moves[pid], &ReplayMove{
 				Type: "m",
 				Sid: sid,
