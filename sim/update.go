@@ -142,8 +142,9 @@ func (self *Game) UpdateFromMoves(all_player_moves []string) (string, *ReplayFra
 
 	new_frame := self.frame.Copy()
 	new_frame.turn += 1
-/*
+
 	// Pretend ships with no move did in fact issue a "o" order... (why did I do this?)
+	// FIXME (2018-11-19) without this, collision detection breaks, but why?
 
 	for _, ship := range self.frame.ships {
 		if ship == nil {
@@ -153,7 +154,7 @@ func (self *Game) UpdateFromMoves(all_player_moves []string) (string, *ReplayFra
 			moves[ship.Sid] = "o"
 		}
 	}
-*/
+
 	// Adjust budgets...
 
 	for pid := 0; pid < players; pid++ {
