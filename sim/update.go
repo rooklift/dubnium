@@ -143,15 +143,15 @@ func (self *Game) UpdateFromMoves(all_player_moves []string) (string, *ReplayFra
 	new_frame := self.frame.Copy()
 	new_frame.turn += 1
 
-	// Pretend ships with no move did in fact issue a "o" order... (why did I do this?)
-	// FIXME (2018-11-19) without this, collision detection breaks, but why?
+	// Make sure ships with no move have an actual entry in the moves map.
+	// This is so that, when we iterate over the keys, we see them.
 
 	for _, ship := range self.frame.ships {
 		if ship == nil {
 			continue
 		}
 		if moves[ship.Sid] == "" {
-			moves[ship.Sid] = "o"
+			moves[ship.Sid] = ""				// Yes!
 		}
 	}
 
