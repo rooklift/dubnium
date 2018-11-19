@@ -237,7 +237,7 @@ func (self *Game) UpdateFromMoves(all_player_moves []string) (string, *ReplayFra
 		dropoff := &Dropoff{
 			Factory: false,
 			Owner: ship.Owner,
-			Sid: ship.Sid,
+			Sid: len(new_frame.dropoffs) - new_frame.Players(),				// Let the id of the dropoff be the array index, ignoring the factories.
 			X: ship.X,
 			Y: ship.Y,
 			Gathered: ship.Halite + new_frame.halite[ship.X][ship.Y],		// Absorbed + ship contents
