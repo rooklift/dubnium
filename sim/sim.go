@@ -289,6 +289,10 @@ func (self *Game) DeathTime(pid int) int {
 	return self.frame.DeathTime(pid)
 }
 
+func (self *Game) TotalHalite() int {
+	return self.frame.TotalHalite()
+}
+
 type Dropoff struct {
 	Factory						bool
 	Owner						int

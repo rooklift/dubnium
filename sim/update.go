@@ -144,7 +144,7 @@ func (self *Game) UpdateFromMoves(all_player_moves []string) (string, *ReplayFra
 	new_frame.turn += 1
 
 	// Make sure ships with no move have an actual entry in the moves map.
-	// This is so that, when we iterate over the keys, we see them.
+	// This is so that, if we iterate over the keys, we see them.
 
 	for _, ship := range self.frame.ships {
 		if ship == nil {
