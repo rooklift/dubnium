@@ -162,6 +162,8 @@ func main() {
 		game.UseFrame(provided_frame)
 	}
 
+	initial_halite := game.TotalHalite()
+
 	json_blob_bytes, _ := json.Marshal(constants)
 	json_blob := string(json_blob_bytes)
 	json_blob = strings.Replace(json_blob, " ", "", -1)
@@ -380,14 +382,16 @@ func main() {
 	if viewer == false {
 
 		type RankScore struct {
+			Cmd				string				`json:"cmd"`
 			Rank			int					`json:"rank"`
 			Score			int					`json:"score"`
 		}
 
 		type PrintedStats struct {
+			MapSeed			uint32				`json:"map_seed"`
 			MapWidth		int					`json:"map_width"`
 			MapHeight		int					`json:"map_height"`
-			MapSeed			uint32				`json:"map_seed"`
+			MapHalite		int					`json:"map_halite"`
 			Replay			string				`json:"replay"`
 			Stats			map[int]RankScore	`json:"stats"`
 			Time			string				`json:"time"`
@@ -395,16 +399,18 @@ func main() {
 
 		ps := new(PrintedStats)
 
+		ps.MapSeed = seed
 		ps.MapWidth = width
 		ps.MapHeight = height
+		ps.MapHalite = initial_halite
 		ps.Replay = replay_filename
-		ps.MapSeed = seed
 		ps.Stats = make(map[int]RankScore)
 		ps.Time = time.Now().Sub(start_time).Round(time.Millisecond).String()
 
 		for pid := 0; pid < players; pid++ {
 
 			rankscore := RankScore{
+				Cmd: botlist[pid],
 				Rank: replay.Stats.Pstats[pid].Rank,
 				Score: replay.Stats.Pstats[pid].FinalProduction,
 			}
