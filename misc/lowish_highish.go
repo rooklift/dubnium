@@ -58,6 +58,8 @@ func runner() {
 			s := fmt.Sprintf("%d-%d", players, size)
 			sort.Ints(results[s])
 
+/*
+
 			half := len(results[s]) / 2
 			third := len(results[s]) / 3
 			quarter := len(results[s]) / 4
@@ -69,6 +71,18 @@ func runner() {
 				results[s][2 * third],
 				results[s][3 * quarter],
 			)
+
+*/
+
+			fifth := len(results[s]) / 5
+
+			fmt.Printf("%s: 20-ile: %d, 40-ile: %d, 60-ile: %d, 80-ile: %d\n", s,
+				results[s][fifth],
+				results[s][fifth * 2],
+				results[s][fifth * 3],
+				results[s][fifth * 4],
+			)
+
 		}
 	}
 
